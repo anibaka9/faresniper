@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+	"regexp"
+)
 
 func main() {
-	fmt.Println("test")
+	file, err := os.ReadFile("test.html")
+	if err != nil {
+		log.Fatal("err")
+	}
+	re := regexp.MustCompile(`data\(\) \{(.*?)mounted\(\)`)
+	data := re.Find(file)
+	fmt.Println(data)
 }

@@ -2,4 +2,4 @@ module github.com/anibaka9/faresniper
 
 go 1.26.1
 
-require golang.org/x/net v0.52.0 // indirect
+require github.com/hjson/hjson-go/v4 v4.6.0

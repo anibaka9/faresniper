@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -13,9 +12,12 @@ func main() {
 	if err != nil {
 		log.Fatal("cant open data/flightsfrom.hjson", err)
 	}
-	fightsData, err := flightsfrom.Parse(hjsonFightsData)
+	flightData, err := flightsfrom.Parse(hjsonFightsData)
 	if err != nil {
 		log.Fatal("cant parse data", err)
 	}
-	fmt.Println(len(fightsData.AllDestinations))
+	err = flightsfrom.SaveToDB(flightData)
+	if err != nil {
+		log.Fatal("cant save", err)
+	}
 }

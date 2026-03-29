@@ -14,10 +14,10 @@ func main() {
 	}
 	flightData, err := flightsfrom.Parse(hjsonFightsData)
 	if err != nil {
-		log.Fatal("cant parse data", err)
+		log.Fatal("cant parse data: ", err)
 	}
 	err = flightsfrom.SaveToDB(flightData)
 	if err != nil {
-		log.Fatal("cant save", err)
+		log.Fatal("cant save: ", err)
 	}
 }

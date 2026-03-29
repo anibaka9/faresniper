@@ -20,7 +20,7 @@ RETURNING
 
 type CreateCityParams struct {
 	Name      string
-	CountryID interface{}
+	CountryID int64
 }
 
 func (q *Queries) CreateCity(ctx context.Context, arg CreateCityParams) (City, error) {
@@ -35,7 +35,7 @@ SELECT
     cities.id, cities.name, cities.country_id
 FROM
     cities
-    JOIN countries ON cites.country_id = countries.id
+    JOIN countries ON cities.country_id = countries.id
 WHERE
     cities.name = ?
     AND countries.country_code = ?

@@ -29,7 +29,7 @@ type Airport struct {
 type City struct {
 	ID        int64
 	Name      string
-	CountryID interface{}
+	CountryID int64
 }
 
 type Country struct {

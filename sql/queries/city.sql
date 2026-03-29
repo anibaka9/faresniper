@@ -11,7 +11,7 @@ SELECT
     cities.*
 FROM
     cities
-    JOIN countries ON cites.country_id = countries.id
+    JOIN countries ON cities.country_id = countries.id
 WHERE
     cities.name = ?
     AND countries.country_code = ?

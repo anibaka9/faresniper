@@ -2,7 +2,7 @@
 CREATE TABLE cities (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
-    country_id ITEGER NOT NULL,
+    country_id INTEGER NOT NULL,
     FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE CASCADE,
     UNIQUE (name, country_id)
 );

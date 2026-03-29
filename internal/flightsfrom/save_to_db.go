@@ -16,59 +16,12 @@ func SaveToDB(flightData *FlightData) error {
 	if error != nil {
 		return fmt.Errorf("cant open db: %w", error)
 	}
-	if err := SaveCountries(flightData.Countries, ctx, c); err != nil {
+	if err := SaveCountries(&flightData.Countries, ctx, c); err != nil {
 		return fmt.Errorf("cant save countries: %w", err)
 	}
 
-	for _, destination := range flightData.AllDestinations {
-
-		fmt.Printf("saving destination %s\n", destination.Airport.Name)
-
-		airport, err := getAirport(destination.Airport.IATA, ctx, c)
-		if err != nil {
-			return fmt.Errorf("cant check if airport exist: %w", err)
-		}
-
-		if airport != nil {
-			fmt.Printf("airport %s already exist, continue", destination.Airport.Name)
-			continue
-		}
-
-		city, err := getCity(destination.Airport.CityName, destination.Airport.CountryCode, ctx, c)
-		if err != nil {
-			return fmt.Errorf("couldnt get city: %w", err)
-		}
-
-		if city == nil {
-			country, err := getCountry(destination.Airport.CountryCode, ctx, c)
-			if err != nil {
-				return fmt.Errorf("couldnt get country: %w", err)
-			}
-			if country == nil {
-				country, err = CreateCountry(&Country{
-					Country:     destination.Airport.Country,
-					CountryCode: destination.Airport.CountryCode,
-				}, ctx, c)
-				if err != nil {
-					return fmt.Errorf("couldnt create country: %w", err)
-				}
-			}
-			city, err = CreateCity(destination.Airport.CityName, country.ID, ctx, c)
-			if err != nil {
-				return fmt.Errorf("cant create city: %w", err)
-			}
-		}
-
-		newAirport, err := c.Queries.CreateAirport(ctx, database.CreateAirportParams{
-			Iata:   destination.Airport.IATA,
-			Name:   destination.Airport.CityName,
-			CityID: city.ID,
-		})
-		if err != nil {
-			return fmt.Errorf("couldnt create airport: %w", error)
-		}
-		fmt.Println(newAirport)
-
+	if err := saveDestanations(&flightData.AllDestinations, ctx, c); err != nil {
+		return fmt.Errorf("cant save destanations: %w", err)
 	}
 
 	return nil
@@ -132,8 +85,8 @@ func CreateCity(cityName string, countryID int64, ctx context.Context, c databas
 	return &city, nil
 }
 
-func SaveCountries(countries []Country, ctx context.Context, c databaseclient.Client) error {
-	for _, country := range countries {
+func SaveCountries(countries *[]Country, ctx context.Context, c databaseclient.Client) error {
+	for _, country := range *countries {
 		fmt.Printf("saving country %s\n", country.Country)
 
 		countryFromDB, err := getCountry(country.CountryCode, ctx, c)
@@ -150,6 +103,67 @@ func SaveCountries(countries []Country, ctx context.Context, c databaseclient.Cl
 		if err != nil {
 			return fmt.Errorf("couldnt insert new country: %w", err)
 		}
+	}
+	return nil
+}
+
+func saveDestanations(destinations *[]Destination, ctx context.Context, c databaseclient.Client) error {
+	for _, destination := range *destinations {
+
+		fmt.Printf("saving destination %s\n", destination.Airport.Name)
+
+		airport, err := getAirport(destination.Airport.IATA, ctx, c)
+		if err != nil {
+			return fmt.Errorf("cant check if airport exist: %w", err)
+		}
+
+		if airport != nil {
+			fmt.Printf("airport %s already exist, continue", destination.Airport.Name)
+			continue
+		}
+
+		city, err := getCity(destination.Airport.CityName, destination.Airport.CountryCode, ctx, c)
+		if err != nil {
+			return fmt.Errorf("couldnt get city: %w", err)
+		}
+
+		if city == nil {
+			country, err := getCountry(destination.Airport.CountryCode, ctx, c)
+			if err != nil {
+				return fmt.Errorf("couldnt get country: %w", err)
+			}
+			if country == nil {
+				country, err = CreateCountry(&Country{
+					Country:     destination.Airport.Country,
+					CountryCode: destination.Airport.CountryCode,
+				}, ctx, c)
+				if err != nil {
+					return fmt.Errorf("couldnt create country: %w", err)
+				}
+			}
+			city, err = CreateCity(destination.Airport.CityName, country.ID, ctx, c)
+			if err != nil {
+				return fmt.Errorf("cant create city: %w", err)
+			}
+		}
+
+		newAirport, err := c.Queries.CreateAirport(ctx, database.CreateAirportParams{
+			Iata:   destination.Airport.IATA,
+			Name:   destination.Airport.CityName,
+			CityID: city.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("couldnt create airport: %w", err)
+		}
+		fmt.Println(newAirport)
+
+	}
+	return nil
+}
+
+func saveRoutes(routes *[]AirlineRouteDetail, ctx context.Context, c databaseclient.Client) error {
+	for _, route := range *routes {
+		fmt.Println(route)
 	}
 	return nil
 }

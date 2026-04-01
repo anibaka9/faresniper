@@ -10,6 +10,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const (
+	tempCountryCode = "KG"
+	tempCity        = "Bishkek"
+	tempIata        = "BSZ"
+	tempAirportName = "Manas International Airport"
+)
+
 func SaveToDB(flightData *FlightData) error {
 	c, error := databaseclient.NewClient()
 	ctx := context.Background()
@@ -22,6 +29,14 @@ func SaveToDB(flightData *FlightData) error {
 
 	if err := saveDestanations(&flightData.AllDestinations, ctx, c); err != nil {
 		return fmt.Errorf("cant save destanations: %w", err)
+	}
+
+	if err := saveTempAirportFrom(ctx, c); err != nil {
+		return fmt.Errorf("cant create airport from: %w", err)
+	}
+
+	if err := saveRoutes(&flightData.Airlines, ctx, c); err != nil {
+		return fmt.Errorf("cant save routes: %w", err)
 	}
 
 	return nil
@@ -161,9 +176,94 @@ func saveDestanations(destinations *[]Destination, ctx context.Context, c databa
 	return nil
 }
 
+func saveTempAirportFrom(ctx context.Context, c databaseclient.Client) error {
+	_, err := c.Queries.GetAirportByIata(ctx, tempIata)
+	var airportExist bool
+	if err == sql.ErrNoRows {
+		airportExist = false
+	} else if err != nil {
+		return fmt.Errorf("cant get airport :%w", err)
+	} else {
+		airportExist = true
+	}
+	if airportExist {
+		return nil
+	}
+
+	country, err := c.Queries.GetCountryByCode(ctx, tempCountryCode)
+	if err != nil {
+		return fmt.Errorf("cant get country: %w", err)
+	}
+	city, err := c.Queries.CreateCity(ctx, database.CreateCityParams{
+		Name:      tempCity,
+		CountryID: country.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("cant create city: %w", err)
+	}
+	_, err = c.Queries.CreateAirport(ctx, database.CreateAirportParams{
+		Iata:   tempIata,
+		Name:   tempAirportName,
+		CityID: city.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("cant create airport: %w", err)
+	}
+	return nil
+}
+
 func saveRoutes(routes *[]AirlineRouteDetail, ctx context.Context, c databaseclient.Client) error {
 	for _, route := range *routes {
-		fmt.Println(route)
+		_, err := c.Queries.GetRouteByFlightsFromId(ctx, int64(route.ID))
+		var noRoute bool
+		if err == sql.ErrNoRows {
+			noRoute = true
+		} else if err != nil {
+			return fmt.Errorf("cant get route: %w", err)
+		} else {
+			noRoute = false
+		}
+		if noRoute == false {
+			fmt.Printf("route from %s to %s by %s already exits, continue\n", route.IataFrom, route.IataTo, route.Airline.IATA)
+			continue
+		}
+
+		airline, err := c.Queries.GetAirlineByFlightsFromId(ctx, int64(route.Airline.ID))
+		if err == sql.ErrNoRows {
+			name := ""
+			if route.Airline.Name != nil {
+				name = *route.Airline.Name
+			}
+			active := true
+			if route.Airline.Active != nil {
+				active = *route.Airline.Active == 1
+			}
+
+			airline, err = c.Queries.CreateAirline(ctx, database.CreateAirlineParams{
+				Iata:     route.Airline.IATA,
+				Name:     name,
+				IsActive: active,
+			})
+		} else if err != nil {
+			return fmt.Errorf("cant get airline: %w", err)
+		}
+		airportFrom, err := c.Queries.GetAirportByIata(ctx, route.IataFrom)
+		if err != nil {
+			return fmt.Errorf("cant get airport route from %s: %w", route.IataFrom, err)
+		}
+		airportTo, err := c.Queries.GetAirportByIata(ctx, route.IataTo)
+		if err != nil {
+			return fmt.Errorf("cant get airport route to %s: %w", route.IataTo, err)
+		}
+		_, err = c.Queries.CreateRoute(ctx, database.CreateRouteParams{
+			FlightsfromID: int64(route.ID),
+			AirlineID:     airline.ID,
+			AirportFromID: airportFrom.ID,
+			AirportToID:   airportTo.ID,
+			IsActive:      route.IsActive == 1,
+		})
+		fmt.Printf("created route from %s to %s with airline %s\n", airportFrom.Name, airportTo.Name, airline.Name)
+
 	}
 	return nil
 }

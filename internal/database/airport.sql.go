@@ -15,7 +15,7 @@ INSERT INTO
 VALUES
     (?, ?, ?)
 RETURNING
-    iata, name, city_id
+    id, iata, name, city_id
 `
 
 type CreateAirportParams struct {
@@ -27,13 +27,18 @@ type CreateAirportParams struct {
 func (q *Queries) CreateAirport(ctx context.Context, arg CreateAirportParams) (Airport, error) {
 	row := q.db.QueryRowContext(ctx, createAirport, arg.Iata, arg.Name, arg.CityID)
 	var i Airport
-	err := row.Scan(&i.Iata, &i.Name, &i.CityID)
+	err := row.Scan(
+		&i.ID,
+		&i.Iata,
+		&i.Name,
+		&i.CityID,
+	)
 	return i, err
 }
 
 const getAirportByIata = `-- name: GetAirportByIata :one
 SELECT
-    iata, name, city_id
+    id, iata, name, city_id
 FROM
     airports
 WHERE
@@ -45,6 +50,11 @@ LIMIT
 func (q *Queries) GetAirportByIata(ctx context.Context, iata string) (Airport, error) {
 	row := q.db.QueryRowContext(ctx, getAirportByIata, iata)
 	var i Airport
-	err := row.Scan(&i.Iata, &i.Name, &i.CityID)
+	err := row.Scan(
+		&i.ID,
+		&i.Iata,
+		&i.Name,
+		&i.CityID,
+	)
 	return i, err
 }

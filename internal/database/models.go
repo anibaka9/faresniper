@@ -4,23 +4,16 @@
 
 package database
 
-import (
-	"database/sql"
-)
-
 type Airline struct {
-	ID        int64
-	Callsign  string
-	Icao      string
-	Iata      string
-	Name      string
-	ShortName string
-	FullName  string
-	IsActive  bool
-	CountryID sql.NullInt64
+	ID            int64
+	FlightsfromID int64
+	Iata          string
+	Name          string
+	IsActive      bool
 }
 
 type Airport struct {
+	ID     int64
 	Iata   string
 	Name   string
 	CityID int64
@@ -40,15 +33,9 @@ type Country struct {
 
 type Route struct {
 	ID            int64
+	FlightsfromID int64
 	AirlineID     int64
 	AirportFromID int64
 	AirportToID   int64
 	IsActive      bool
-	Day1          bool
-	Day2          bool
-	Day3          bool
-	Day4          bool
-	Day5          bool
-	Day6          bool
-	Day7          bool
 }

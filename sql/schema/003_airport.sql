@@ -1,6 +1,7 @@
 -- +goose Up
 CREATE TABLE airports (
-    iata TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
+    iata TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     city_id INTEGER NOT NULL,
     FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE

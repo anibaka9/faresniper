@@ -48,15 +48,15 @@ func (q *Queries) GetCountryByCode(ctx context.Context, countryCode string) (Cou
 	return i, err
 }
 
-const listUsers = `-- name: ListUsers :many
+const listCountries = `-- name: ListCountries :many
 SELECT
     id, country_code, name
 FROM
     countries
 `
 
-func (q *Queries) ListUsers(ctx context.Context) ([]Country, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers)
+func (q *Queries) ListCountries(ctx context.Context) ([]Country, error) {
+	rows, err := q.db.QueryContext(ctx, listCountries)
 	if err != nil {
 		return nil, err
 	}

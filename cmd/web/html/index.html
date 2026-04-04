@@ -1,0 +1,35 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Faresniper</title>
+        <link rel="stylesheet" href="tailwind/output.css" />
+    </head>
+    <body class="h-screen flex">
+        {{ template "sidebar" .}}
+        <main class="m-4">
+            <div class="stats shadow">
+                <div class="stat">
+                    <div class="stat-title">Routes</div>
+                    <div class="stat-value">{{ .RoutesNum }}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Airlines</div>
+                    <div class="stat-value">{{ .AirlinesNum }}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Airports</div>
+                    <div class="stat-value">{{ .AirportsNum }}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Cities</div>
+                    <div class="stat-value">{{ .CitiesNum }}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-title">Countries</div>
+                    <div class="stat-value">{{ .CountriesNum }}</div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

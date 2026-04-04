@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/anibaka9/faresniper/internal/database"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/pressly/goose/v3"
 )
 

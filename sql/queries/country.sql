@@ -16,7 +16,7 @@ WHERE
 LIMIT
     1;
 
--- name: ListUsers :many
+-- name: ListCountries :many
 SELECT
     *
 FROM

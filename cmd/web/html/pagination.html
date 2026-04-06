@@ -1,0 +1,15 @@
+{{ define "pagination" }}
+<div class="join">
+    {{if }} <button class="join-item btn btn-xs">1</button>
+    <button class="join-item btn btn-xs btn-active">2</button>
+    <button class="join-item btn btn-xs">3</button>
+    <button class="join-item btn btn-xs">4</button>
+    {{else}}
+    <button class="join-item btn">1</button>
+    <button class="join-item btn">2</button>
+    <button class="join-item btn btn-disabled">...</button>
+    <button class="join-item btn">99</button>
+    <button class="join-item btn">100</button>
+    {{end}}
+</div>
+{{ end }}

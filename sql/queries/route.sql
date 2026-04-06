@@ -31,3 +31,26 @@ WHERE
     routes.id = ?
 LIMIT
     1;
+
+-- name: GetRoutes :many
+SELECT
+    r.id,
+    r.airport_from_id,
+    af.name AS airport_from_name,
+    r.airport_to_id,
+    at.name AS airport_to_name,
+    r.airline_id,
+    ar.name AS airline_name
+FROM
+    routes r
+    JOIN airports af ON af.id = r.airport_from_id
+    JOIN airports at ON at.id = r.airport_to_id
+    JOIN airlines ar ON ar.id = r.airline_id
+LIMIT
+    ? OFFSET ?;
+
+-- name: CountRoutes :one
+SELECT
+    COUNT(*) AS CountRoutes
+FROM
+    routes;

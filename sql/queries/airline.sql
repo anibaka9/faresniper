@@ -1,12 +1,13 @@
 -- name: CreateAirline :one
 INSERT INTO
     airlines (
+        flightsfrom_id,
         iata,
         name,
         is_active
     )
 VALUES
-    (?, ?, ?)
+    (?, ?, ?, ?)
 RETURNING
     *;
 

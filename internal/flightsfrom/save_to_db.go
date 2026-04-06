@@ -164,7 +164,7 @@ func saveDestanations(destinations *[]Destination, ctx context.Context, c databa
 
 		newAirport, err := c.Queries.CreateAirport(ctx, database.CreateAirportParams{
 			Iata:   destination.Airport.IATA,
-			Name:   destination.Airport.CityName,
+			Name:   destination.Airport.Name,
 			CityID: city.ID,
 		})
 		if err != nil {
@@ -228,6 +228,8 @@ func saveRoutes(routes *[]AirlineRouteDetail, ctx context.Context, c databasecli
 			continue
 		}
 
+		fmt.Println("Airline.ID", route.Airline.ID)
+
 		airline, err := c.Queries.GetAirlineByFlightsFromId(ctx, int64(route.Airline.ID))
 		if err == sql.ErrNoRows {
 			name := ""
@@ -240,10 +242,12 @@ func saveRoutes(routes *[]AirlineRouteDetail, ctx context.Context, c databasecli
 			}
 
 			airline, err = c.Queries.CreateAirline(ctx, database.CreateAirlineParams{
-				Iata:     route.Airline.IATA,
-				Name:     name,
-				IsActive: active,
+				FlightsfromID: int64(route.Airline.ID),
+				Iata:          route.Airline.IATA,
+				Name:          name,
+				IsActive:      active,
 			})
+			fmt.Println("airline", airline)
 		} else if err != nil {
 			return fmt.Errorf("cant get airline: %w", err)
 		}

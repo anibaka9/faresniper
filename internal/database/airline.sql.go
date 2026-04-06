@@ -12,24 +12,31 @@ import (
 const createAirline = `-- name: CreateAirline :one
 INSERT INTO
     airlines (
+        flightsfrom_id,
         iata,
         name,
         is_active
     )
 VALUES
-    (?, ?, ?)
+    (?, ?, ?, ?)
 RETURNING
     id, flightsfrom_id, iata, name, is_active
 `
 
 type CreateAirlineParams struct {
-	Iata     string
-	Name     string
-	IsActive bool
+	FlightsfromID int64
+	Iata          string
+	Name          string
+	IsActive      bool
 }
 
 func (q *Queries) CreateAirline(ctx context.Context, arg CreateAirlineParams) (Airline, error) {
-	row := q.db.QueryRowContext(ctx, createAirline, arg.Iata, arg.Name, arg.IsActive)
+	row := q.db.QueryRowContext(ctx, createAirline,
+		arg.FlightsfromID,
+		arg.Iata,
+		arg.Name,
+		arg.IsActive,
+	)
 	var i Airline
 	err := row.Scan(
 		&i.ID,

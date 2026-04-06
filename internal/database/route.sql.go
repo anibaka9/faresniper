@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const countRoutes = `-- name: CountRoutes :one
+SELECT
+    COUNT(*) AS CountRoutes
+FROM
+    routes
+`
+
+func (q *Queries) CountRoutes(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countRoutes)
+	var countroutes int64
+	err := row.Scan(&countroutes)
+	return countroutes, err
+}
+
 const createRoute = `-- name: CreateRoute :one
 INSERT INTO
     routes (
@@ -100,4 +114,68 @@ func (q *Queries) GetRouteByFlightsFromId(ctx context.Context, flightsfromID int
 		&i.IsActive,
 	)
 	return i, err
+}
+
+const getRoutes = `-- name: GetRoutes :many
+SELECT
+    r.id,
+    r.airport_from_id,
+    af.name AS airport_from_name,
+    r.airport_to_id,
+    at.name AS airport_to_name,
+    r.airline_id,
+    ar.name AS airline_name
+FROM
+    routes r
+    JOIN airports af ON af.id = r.airport_from_id
+    JOIN airports at ON at.id = r.airport_to_id
+    JOIN airlines ar ON ar.id = r.airline_id
+LIMIT
+    ? OFFSET ?
+`
+
+type GetRoutesParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetRoutesRow struct {
+	ID              int64
+	AirportFromID   int64
+	AirportFromName string
+	AirportToID     int64
+	AirportToName   string
+	AirlineID       int64
+	AirlineName     string
+}
+
+func (q *Queries) GetRoutes(ctx context.Context, arg GetRoutesParams) ([]GetRoutesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRoutes, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRoutesRow
+	for rows.Next() {
+		var i GetRoutesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.AirportFromID,
+			&i.AirportFromName,
+			&i.AirportToID,
+			&i.AirportToName,
+			&i.AirlineID,
+			&i.AirlineName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

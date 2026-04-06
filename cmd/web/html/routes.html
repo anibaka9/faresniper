@@ -1,0 +1,38 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Faresniper</title>
+        <link rel="stylesheet" href="tailwind/output.css" />
+    </head>
+    <body class="h-screen flex">
+        {{ template "sidebar" .}}
+        <main class="p-4">
+            <div
+                class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full"
+            >
+                <table class="table w-full">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Airline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range .Routes }}
+                        <tr>
+                            <td>{{ .ID }}</td>
+                            <td>{{ .AirportFromName }}</td>
+                            <td>{{ .AirportToName }}</td>
+                            <td>{{ .AirlineName }}</td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+            {{ template "pagination" . }}
+        </main>
+    </body>
+</html>

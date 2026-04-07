@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 type PaginationParams struct {
 	TotalPages   int64
 	TotalCount   int64
@@ -16,6 +18,7 @@ type PaginationData struct {
 }
 
 type PageItem struct {
+	Label    string
 	Number   int
 	IsActive bool
 	IsGap    bool
@@ -24,11 +27,16 @@ type PageItem struct {
 const MaxPages = 4
 
 func GetPaginationData(pagination PaginationParams) PaginationData {
-	pages := []PageItem{}
+	pagesNum := 5
+	if pagination.TotalPages < 5 {
+		pagesNum = int(pagination.TotalPages)
+	}
+	pages := make([]PageItem, pagesNum)
 	if pagination.TotalPages <= MaxPages {
 		for i := 0; i < int(pagination.TotalPages); i++ {
 			pages[i] = PageItem{
-				Number:   i + 1,
+				Number:   i,
+				Label:    strconv.Itoa(i + 1),
 				IsActive: i == int(pagination.CurrentPage),
 				IsGap:    false,
 			}
@@ -36,19 +44,22 @@ func GetPaginationData(pagination PaginationParams) PaginationData {
 	} else {
 		for i := range MaxPages / 2 {
 			pages[i] = PageItem{
-				Number:   i + 1,
+				Number:   i,
+				Label:    strconv.Itoa(i + 1),
 				IsActive: i == int(pagination.CurrentPage),
 				IsGap:    false,
 			}
 		}
 		pages[MaxPages/2] = PageItem{
-			Number:   MaxPages / 2,
+			Number:   MaxPages/2 - 1,
+			Label:    strconv.Itoa(MaxPages/2 + 1),
 			IsActive: false,
 			IsGap:    true,
 		}
 		for i := int(pagination.TotalPages - MaxPages/2); i < int(pagination.TotalPages); i++ {
 			pages[i] = PageItem{
-				Number:   i + 1,
+				Number:   i,
+				Label:    strconv.Itoa(i + 1),
 				IsActive: i == int(pagination.CurrentPage),
 				IsGap:    false,
 			}

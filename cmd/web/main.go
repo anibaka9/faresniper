@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -36,7 +35,13 @@ func main() {
 			return
 		}
 
-		err = t.Execute(w, stats)
+		err = t.Execute(w, struct {
+			SidebarData []SidebarItem
+			Stats       database.GetStatsRow
+		}{
+			SidebarData: GetSidebarData("/"),
+			Stats:       stats,
+		})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -65,24 +70,26 @@ func main() {
 			Limit:  Limit,
 			Offset: Limit * int64(page),
 		})
-
-		fmt.Println(routes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
+		paginationData := GetPaginationData(PaginationParams{
+			TotalPages:   countRoutes / Limit,
+			TotalCount:   countRoutes,
+			CurrentPage:  int64(page),
+			CurrentLimit: Limit,
+		})
+
 		err = t.Execute(w, struct {
-			PaginationParams PaginationParams
-			Routes           []database.GetRoutesRow
+			SidebarData    []SidebarItem
+			PaginationData PaginationData
+			Routes         []database.GetRoutesRow
 		}{
-			PaginationParams: PaginationParams{
-				TotalPages:   countRoutes / Limit,
-				TotalCount:   countRoutes,
-				CurrentPage:  int64(page),
-				CurrentLimit: Limit,
-			},
-			Routes: routes,
+			SidebarData:    GetSidebarData("/routes"),
+			PaginationData: paginationData,
+			Routes:         routes,
 		})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -1,10 +1,11 @@
 {{ define "sidebar"}}
-<ul class="menu bg-base-200 rounded-box w-56">
-    <li><a href="/">Dashboard</a></li>
-    <li><a href="/routes">Routes</a></li>
-    <li><a href="/airlines">Airlines</a></li>
-    <li><a href="/airports">Airports</a></li>
-    <li><a href="/cities">Cities</a></li>
-    <li><a href="/countries">Cities</a></li>
+<ul class="menu bg-base-200 rounded-box w-56 shrink-0">
+    {{range .SidebarData}}
+    <li>
+        <a href="{{ .Link }}" class="{{if .IsActive}} menu-active {{end}}"
+            >{{.Title}}</a
+        >
+    </li>
+    {{ end }}
 </ul>
 {{ end }}

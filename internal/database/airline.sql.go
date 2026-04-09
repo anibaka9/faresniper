@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const countAirlines = `-- name: CountAirlines :one
+SELECT
+    COUNT(*) AS cont_airlines
+FROM
+    airlines
+`
+
+func (q *Queries) CountAirlines(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countAirlines)
+	var cont_airlines int64
+	err := row.Scan(&cont_airlines)
+	return cont_airlines, err
+}
+
 const createAirline = `-- name: CreateAirline :one
 INSERT INTO
     airlines (
@@ -94,4 +108,47 @@ func (q *Queries) GetAirlineByFlightsFromId(ctx context.Context, flightsfromID i
 		&i.IsActive,
 	)
 	return i, err
+}
+
+const getAirlines = `-- name: GetAirlines :many
+SELECT
+    id, flightsfrom_id, iata, name, is_active
+FROM
+    airlines
+LIMIT
+    ? OFFSET ?
+`
+
+type GetAirlinesParams struct {
+	Limit  int64
+	Offset int64
+}
+
+func (q *Queries) GetAirlines(ctx context.Context, arg GetAirlinesParams) ([]Airline, error) {
+	rows, err := q.db.QueryContext(ctx, getAirlines, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Airline
+	for rows.Next() {
+		var i Airline
+		if err := rows.Scan(
+			&i.ID,
+			&i.FlightsfromID,
+			&i.Iata,
+			&i.Name,
+			&i.IsActive,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

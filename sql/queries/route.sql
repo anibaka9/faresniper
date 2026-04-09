@@ -55,6 +55,6 @@ LIMIT
 
 -- name: CountRoutes :one
 SELECT
-    COUNT(*) AS CountRoutes
+    COUNT(*) AS count_routes
 FROM
     routes;

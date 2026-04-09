@@ -30,3 +30,17 @@ WHERE
     airlines.id = ?
 LIMIT
     1;
+
+-- name: GetAirlines :many
+SELECT
+    *
+FROM
+    airlines
+LIMIT
+    ? OFFSET ?;
+
+-- name: CountAirlines :one
+SELECT
+    COUNT(*) AS cont_airlines
+FROM
+    airlines;

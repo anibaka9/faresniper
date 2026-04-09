@@ -11,16 +11,16 @@ import (
 
 const countRoutes = `-- name: CountRoutes :one
 SELECT
-    COUNT(*) AS CountRoutes
+    COUNT(*) AS count_routes
 FROM
     routes
 `
 
 func (q *Queries) CountRoutes(ctx context.Context) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countRoutes)
-	var countroutes int64
-	err := row.Scan(&countroutes)
-	return countroutes, err
+	var count_routes int64
+	err := row.Scan(&count_routes)
+	return count_routes, err
 }
 
 const createRoute = `-- name: CreateRoute :one

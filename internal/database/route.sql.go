@@ -120,9 +120,11 @@ const getRoutes = `-- name: GetRoutes :many
 SELECT
     r.id,
     r.airport_from_id,
-    af.name AS airport_from_name,
+    cf.name AS city_from_name,
+    af.iata AS airport_from_iata,
     r.airport_to_id,
-    at.name AS airport_to_name,
+    ct.name AS city_to_name,
+    at.iata AS airport_to_iata,
     r.airline_id,
     ar.name AS airline_name
 FROM
@@ -130,6 +132,8 @@ FROM
     JOIN airports af ON af.id = r.airport_from_id
     JOIN airports at ON at.id = r.airport_to_id
     JOIN airlines ar ON ar.id = r.airline_id
+    JOIN cities cf ON af.city_id = cf.id
+    JOIN cities ct ON at.city_id = ct.id
 LIMIT
     ? OFFSET ?
 `
@@ -142,9 +146,11 @@ type GetRoutesParams struct {
 type GetRoutesRow struct {
 	ID              int64
 	AirportFromID   int64
-	AirportFromName string
+	CityFromName    string
+	AirportFromIata string
 	AirportToID     int64
-	AirportToName   string
+	CityToName      string
+	AirportToIata   string
 	AirlineID       int64
 	AirlineName     string
 }
@@ -161,9 +167,11 @@ func (q *Queries) GetRoutes(ctx context.Context, arg GetRoutesParams) ([]GetRout
 		if err := rows.Scan(
 			&i.ID,
 			&i.AirportFromID,
-			&i.AirportFromName,
+			&i.CityFromName,
+			&i.AirportFromIata,
 			&i.AirportToID,
-			&i.AirportToName,
+			&i.CityToName,
+			&i.AirportToIata,
 			&i.AirlineID,
 			&i.AirlineName,
 		); err != nil {

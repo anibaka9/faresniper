@@ -1,6 +1,9 @@
 package main
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 type PaginationParams struct {
 	TotalPages   int64
@@ -27,6 +30,7 @@ type PageItem struct {
 const MaxPages = 4
 
 func GetPaginationData(pagination PaginationParams) PaginationData {
+	fmt.Println(pagination.TotalPages)
 	pagesNum := 5
 	if pagination.TotalPages < 5 {
 		pagesNum = int(pagination.TotalPages)

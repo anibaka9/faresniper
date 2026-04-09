@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -76,7 +77,7 @@ func main() {
 		}
 
 		paginationData := GetPaginationData(PaginationParams{
-			TotalPages:   countRoutes / Limit,
+			TotalPages:   int64(math.Ceil(float64(countRoutes) / float64(Limit))),
 			TotalCount:   countRoutes,
 			CurrentPage:  int64(page),
 			CurrentLimit: Limit,

@@ -36,9 +36,11 @@ LIMIT
 SELECT
     r.id,
     r.airport_from_id,
-    af.name AS airport_from_name,
+    cf.name AS city_from_name,
+    af.iata AS airport_from_iata,
     r.airport_to_id,
-    at.name AS airport_to_name,
+    ct.name AS city_to_name,
+    at.iata AS airport_to_iata,
     r.airline_id,
     ar.name AS airline_name
 FROM
@@ -46,6 +48,8 @@ FROM
     JOIN airports af ON af.id = r.airport_from_id
     JOIN airports at ON at.id = r.airport_to_id
     JOIN airlines ar ON ar.id = r.airline_id
+    JOIN cities cf ON af.city_id = cf.id
+    JOIN cities ct ON at.city_id = ct.id
 LIMIT
     ? OFFSET ?;
 

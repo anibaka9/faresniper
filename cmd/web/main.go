@@ -27,11 +27,17 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+
+	r.Use(middleware.Compress(5, "text/html", "text/css"))
+
 	r.Use(middleware.Logger)
+
 	r.Get("/", server.handleIndex)
 	r.Get("/routes", server.handleRoutes)
 	r.Get("/airlines", server.handleAirlines)
+	r.Get("/airports", server.handleAirports)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
+
 	http.ListenAndServe(":3000", r)
 }

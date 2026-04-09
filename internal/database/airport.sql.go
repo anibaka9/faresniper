@@ -58,3 +58,59 @@ func (q *Queries) GetAirportByIata(ctx context.Context, iata string) (Airport, e
 	)
 	return i, err
 }
+
+const getAirports = `-- name: GetAirports :many
+SELECT
+    a.id,
+    a.iata,
+    a.name,
+    a.city_id,
+    c.name city_name
+FROM
+    airports a
+    JOIN cities c ON a.city_id = c.id
+LIMIT
+    ? OFFSET ?
+`
+
+type GetAirportsParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetAirportsRow struct {
+	ID       int64
+	Iata     string
+	Name     string
+	CityID   int64
+	CityName string
+}
+
+func (q *Queries) GetAirports(ctx context.Context, arg GetAirportsParams) ([]GetAirportsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAirports, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAirportsRow
+	for rows.Next() {
+		var i GetAirportsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Iata,
+			&i.Name,
+			&i.CityID,
+			&i.CityName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

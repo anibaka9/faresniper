@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const countCities = `-- name: CountCities :one
+SELECT
+    COUNT(*) AS count_cities
+FROM
+    cities
+`
+
+func (q *Queries) CountCities(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCities)
+	var count_cities int64
+	err := row.Scan(&count_cities)
+	return count_cities, err
+}
+
 const createCity = `-- name: CreateCity :one
 INSERT INTO
     cities (name, country_id)
@@ -28,6 +42,57 @@ func (q *Queries) CreateCity(ctx context.Context, arg CreateCityParams) (City, e
 	var i City
 	err := row.Scan(&i.ID, &i.Name, &i.CountryID)
 	return i, err
+}
+
+const getCities = `-- name: GetCities :many
+SELECT
+    ct.id, ct.name, ct.country_id,
+    cr.name country_name
+FROM
+    cities ct
+    JOIN countries cr ON ct.country_id = cr.id
+LIMIT
+    ? OFFSET ?
+`
+
+type GetCitiesParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetCitiesRow struct {
+	ID          int64
+	Name        string
+	CountryID   int64
+	CountryName string
+}
+
+func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCitiesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCities, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCitiesRow
+	for rows.Next() {
+		var i GetCitiesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.CountryID,
+			&i.CountryName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getCityByCountyCodeAndName = `-- name: GetCityByCountyCodeAndName :one

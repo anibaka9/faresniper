@@ -9,8 +9,8 @@ import (
 	"github.com/anibaka9/faresniper/internal/database"
 )
 
-func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("./cmd/web/html/airports.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
+func (s Server) handleCities(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./cmd/web/html/cities.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -21,13 +21,13 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 		page = 0
 	}
 
-	countAirports, err := s.db.Queries.CountAirports(r.Context())
+	countCities, err := s.db.Queries.CountCities(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	airports, err := s.db.Queries.GetAirports(r.Context(), database.GetAirportsParams{
+	cities, err := s.db.Queries.GetCities(r.Context(), database.GetCitiesParams{
 		Limit:  Limit,
 		Offset: Limit * int64(page),
 	})
@@ -37,8 +37,8 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	paginationData := GetPaginationData(PaginationParams{
-		TotalPages:   int64(math.Ceil(float64(countAirports) / float64(Limit))),
-		TotalCount:   countAirports,
+		TotalPages:   int64(math.Ceil(float64(countCities) / float64(Limit))),
+		TotalCount:   countCities,
 		CurrentPage:  int64(page),
 		CurrentLimit: Limit,
 	})
@@ -46,11 +46,11 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 	err = t.Execute(w, struct {
 		SidebarData    []SidebarItem
 		PaginationData PaginationData
-		Airports       []database.GetAirportsRow
+		Cities         []database.GetCitiesRow
 	}{
-		SidebarData:    GetSidebarData("/airports"),
+		SidebarData:    GetSidebarData("/cities"),
 		PaginationData: paginationData,
-		Airports:       airports,
+		Cities:         cities,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

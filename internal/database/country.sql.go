@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const countCountries = `-- name: CountCountries :one
+SELECT
+    COUNT(*) AS count_countries
+FROM
+    countries
+`
+
+func (q *Queries) CountCountries(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCountries)
+	var count_countries int64
+	err := row.Scan(&count_countries)
+	return count_countries, err
+}
+
 const createCountry = `-- name: CreateCountry :one
 INSERT INTO
     countries (country_code, name)
@@ -30,33 +44,22 @@ func (q *Queries) CreateCountry(ctx context.Context, arg CreateCountryParams) (C
 	return i, err
 }
 
-const getCountryByCode = `-- name: GetCountryByCode :one
+const getCountries = `-- name: GetCountries :many
 SELECT
     id, country_code, name
 FROM
     countries
-WHERE
-    country_code = ?
 LIMIT
-    1
+    ? OFFSET ?
 `
 
-func (q *Queries) GetCountryByCode(ctx context.Context, countryCode string) (Country, error) {
-	row := q.db.QueryRowContext(ctx, getCountryByCode, countryCode)
-	var i Country
-	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
-	return i, err
+type GetCountriesParams struct {
+	Limit  int64
+	Offset int64
 }
 
-const listCountries = `-- name: ListCountries :many
-SELECT
-    id, country_code, name
-FROM
-    countries
-`
-
-func (q *Queries) ListCountries(ctx context.Context) ([]Country, error) {
-	rows, err := q.db.QueryContext(ctx, listCountries)
+func (q *Queries) GetCountries(ctx context.Context, arg GetCountriesParams) ([]Country, error) {
+	rows, err := q.db.QueryContext(ctx, getCountries, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -76,4 +79,22 @@ func (q *Queries) ListCountries(ctx context.Context) ([]Country, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getCountryByCode = `-- name: GetCountryByCode :one
+SELECT
+    id, country_code, name
+FROM
+    countries
+WHERE
+    country_code = ?
+LIMIT
+    1
+`
+
+func (q *Queries) GetCountryByCode(ctx context.Context, countryCode string) (Country, error) {
+	row := q.db.QueryRowContext(ctx, getCountryByCode, countryCode)
+	var i Country
+	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
+	return i, err
 }

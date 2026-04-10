@@ -16,8 +16,16 @@ WHERE
 LIMIT
     1;
 
--- name: ListCountries :many
+-- name: GetCountries :many
 SELECT
     *
+FROM
+    countries
+LIMIT
+    ? OFFSET ?;
+
+-- name: CountCountries :one
+SELECT
+    COUNT(*) AS count_countries
 FROM
     countries;

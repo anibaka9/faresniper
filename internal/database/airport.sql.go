@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const countAirports = `-- name: CountAirports :one
+SELECT
+    COUNT(*) AS count_airports
+FROM
+    airports
+`
+
+func (q *Queries) CountAirports(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countAirports)
+	var count_airports int64
+	err := row.Scan(&count_airports)
+	return count_airports, err
+}
+
 const createAirport = `-- name: CreateAirport :one
 INSERT INTO
     airports (iata, name, city_id)

@@ -36,6 +36,8 @@ func main() {
 	r.Get("/routes", server.handleRoutes)
 	r.Get("/airlines", server.handleAirlines)
 	r.Get("/airports", server.handleAirports)
+	r.Get("/cities", server.handleCities)
+	r.Get("/countries", server.handleCountries)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
 

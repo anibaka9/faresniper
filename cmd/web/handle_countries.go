@@ -9,8 +9,8 @@ import (
 	"github.com/anibaka9/faresniper/internal/database"
 )
 
-func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("./cmd/web/html/airports.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
+func (s Server) handleCountries(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./cmd/web/html/countries.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -21,13 +21,13 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 		page = 0
 	}
 
-	countAirports, err := s.db.Queries.CountAirports(r.Context())
+	countCountries, err := s.db.Queries.CountCountries(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	airports, err := s.db.Queries.GetAirports(r.Context(), database.GetAirportsParams{
+	countries, err := s.db.Queries.GetCountries(r.Context(), database.GetCountriesParams{
 		Limit:  Limit,
 		Offset: Limit * int64(page),
 	})
@@ -37,8 +37,8 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	paginationData := GetPaginationData(PaginationParams{
-		TotalPages:   int64(math.Ceil(float64(countAirports) / float64(Limit))),
-		TotalCount:   countAirports,
+		TotalPages:   int64(math.Ceil(float64(countCountries) / float64(Limit))),
+		TotalCount:   countCountries,
 		CurrentPage:  int64(page),
 		CurrentLimit: Limit,
 	})
@@ -46,11 +46,11 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 	err = t.Execute(w, struct {
 		SidebarData    []SidebarItem
 		PaginationData PaginationData
-		Airports       []database.GetAirportsRow
+		Countries      []database.Country
 	}{
-		SidebarData:    GetSidebarData("/airports"),
+		SidebarData:    GetSidebarData("/countries"),
 		PaginationData: paginationData,
-		Airports:       airports,
+		Countries:      countries,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -50,6 +50,43 @@ func (q *Queries) CreateAirport(ctx context.Context, arg CreateAirportParams) (A
 	return i, err
 }
 
+const getAirport = `-- name: GetAirport :one
+SELECT
+    a.id,
+    a.iata,
+    a.name,
+    a.city_id,
+    c.name AS city_name
+FROM
+    airports a
+    JOIN cities c ON a.city_id = c.id
+WHERE
+    a.id = ?
+LIMIT
+    1
+`
+
+type GetAirportRow struct {
+	ID       int64
+	Iata     string
+	Name     string
+	CityID   int64
+	CityName string
+}
+
+func (q *Queries) GetAirport(ctx context.Context, id int64) (GetAirportRow, error) {
+	row := q.db.QueryRowContext(ctx, getAirport, id)
+	var i GetAirportRow
+	err := row.Scan(
+		&i.ID,
+		&i.Iata,
+		&i.Name,
+		&i.CityID,
+		&i.CityName,
+	)
+	return i, err
+}
+
 const getAirportByIata = `-- name: GetAirportByIata :one
 SELECT
     id, iata, name, city_id

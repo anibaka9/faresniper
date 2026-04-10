@@ -19,6 +19,7 @@
                             <th>IATA</th>
                             <th>Name</th>
                             <th>Acitve</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -29,6 +30,9 @@
                             <td>{{ .Name }}</td>
                             <td>
                                 {{ if .IsActive }} Yes {{else}} No {{ end }}
+                            </td>
+                            <td>
+                                <a href="/airlines/{{ .ID }}" class="btn btn-sm">Open</a>
                             </td>
                         </tr>
                         {{ end }}

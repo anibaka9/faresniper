@@ -95,6 +95,43 @@ func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCiti
 	return items, nil
 }
 
+const getCity = `-- name: GetCity :one
+SELECT
+    ct.id,
+    ct.name,
+    ct.country_id,
+    cr.name AS country_name,
+    cr.country_code
+FROM
+    cities ct
+    JOIN countries cr ON ct.country_id = cr.id
+WHERE
+    ct.id = ?
+LIMIT
+    1
+`
+
+type GetCityRow struct {
+	ID          int64
+	Name        string
+	CountryID   int64
+	CountryName string
+	CountryCode string
+}
+
+func (q *Queries) GetCity(ctx context.Context, id int64) (GetCityRow, error) {
+	row := q.db.QueryRowContext(ctx, getCity, id)
+	var i GetCityRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CountryID,
+		&i.CountryName,
+		&i.CountryCode,
+	)
+	return i, err
+}
+
 const getCityByCountyCodeAndName = `-- name: GetCityByCountyCodeAndName :one
 SELECT
     cities.id, cities.name, cities.country_id

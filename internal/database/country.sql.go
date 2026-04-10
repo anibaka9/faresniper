@@ -81,6 +81,24 @@ func (q *Queries) GetCountries(ctx context.Context, arg GetCountriesParams) ([]C
 	return items, nil
 }
 
+const getCountry = `-- name: GetCountry :one
+SELECT
+    id, country_code, name
+FROM
+    countries
+WHERE
+    id = ?
+LIMIT
+    1
+`
+
+func (q *Queries) GetCountry(ctx context.Context, id int64) (Country, error) {
+	row := q.db.QueryRowContext(ctx, getCountry, id)
+	var i Country
+	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
+	return i, err
+}
+
 const getCountryByCode = `-- name: GetCountryByCode :one
 SELECT
     id, country_code, name

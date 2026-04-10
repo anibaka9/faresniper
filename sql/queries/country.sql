@@ -16,6 +16,16 @@ WHERE
 LIMIT
     1;
 
+-- name: GetCountry :one
+SELECT
+    *
+FROM
+    countries
+WHERE
+    id = ?
+LIMIT
+    1;
+
 -- name: GetCountries :many
 SELECT
     *

@@ -19,6 +19,7 @@
                             <th>IATA</th>
                             <th>Name</th>
                             <th>City</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -28,6 +29,9 @@
                             <td>{{ .Iata }}</td>
                             <td>{{ .Name }}</td>
                             <td>{{ .CityName }}</td>
+                            <td>
+                                <a href="/airports/{{ .ID }}" class="btn btn-sm">Open</a>
+                            </td>
                         </tr>
                         {{ end }}
                     </tbody>

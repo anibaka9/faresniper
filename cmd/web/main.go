@@ -38,6 +38,11 @@ func main() {
 	r.Get("/airports", server.handleAirports)
 	r.Get("/cities", server.handleCities)
 	r.Get("/countries", server.handleCountries)
+	r.Get("/countries/{country_id}", server.handleCountry)
+	r.Get("/airlines/{airline_id}", server.handleAirline)
+	r.Get("/airports/{airport_id}", server.handleAirport)
+	r.Get("/cities/{city_id}", server.handleCity)
+	r.Get("/routes/{route_id}", server.handleRoute)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
 

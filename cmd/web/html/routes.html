@@ -19,6 +19,7 @@
                             <th>From</th>
                             <th>To</th>
                             <th>Airline</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,6 +31,9 @@
                             </td>
                             <td>{{ .CityToName }} ({{ .AirportToIata }})</td>
                             <td>{{ .AirlineName }}</td>
+                            <td>
+                                <a href="/routes/{{ .ID }}" class="btn btn-sm">Open</a>
+                            </td>
                         </tr>
                         {{ end }}
                     </tbody>

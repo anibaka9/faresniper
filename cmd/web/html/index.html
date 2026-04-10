@@ -7,36 +7,34 @@
     </head>
     <body class="h-screen flex">
         {{ template "sidebar" .}}
-        <main class="m-4">
-            <div class="stats shadow">
-                <div class="stat">
+        <main class="p-6 w-full">
+            <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+            <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                <a href="/routes" class="stat bg-base-100 border border-base-content/5 rounded-box shadow-sm hover:border-primary/40 hover:shadow-md transition-all">
                     <div class="stat-title">Routes</div>
                     <div class="stat-value">{{ .Stats.RoutesNum }}</div>
-                </div>
-            </div>
-            <div class="stats shadow">
-                <div class="stat">
+                    <div class="stat-desc">View all →</div>
+                </a>
+                <a href="/airlines" class="stat bg-base-100 border border-base-content/5 rounded-box shadow-sm hover:border-primary/40 hover:shadow-md transition-all">
                     <div class="stat-title">Airlines</div>
                     <div class="stat-value">{{ .Stats.AirlinesNum }}</div>
-                </div>
-            </div>
-            <div class="stats shadow">
-                <div class="stat">
+                    <div class="stat-desc">View all →</div>
+                </a>
+                <a href="/airports" class="stat bg-base-100 border border-base-content/5 rounded-box shadow-sm hover:border-primary/40 hover:shadow-md transition-all">
                     <div class="stat-title">Airports</div>
                     <div class="stat-value">{{ .Stats.AirportsNum }}</div>
-                </div>
-            </div>
-            <div class="stats shadow">
-                <div class="stat">
+                    <div class="stat-desc">View all →</div>
+                </a>
+                <a href="/cities" class="stat bg-base-100 border border-base-content/5 rounded-box shadow-sm hover:border-primary/40 hover:shadow-md transition-all">
                     <div class="stat-title">Cities</div>
                     <div class="stat-value">{{ .Stats.CitiesNum }}</div>
-                </div>
-            </div>
-            <div class="stats shadow">
-                <div class="stat">
+                    <div class="stat-desc">View all →</div>
+                </a>
+                <a href="/countries" class="stat bg-base-100 border border-base-content/5 rounded-box shadow-sm hover:border-primary/40 hover:shadow-md transition-all">
                     <div class="stat-title">Countries</div>
                     <div class="stat-value">{{ .Stats.CountriesNum }}</div>
-                </div>
+                    <div class="stat-desc">View all →</div>
+                </a>
             </div>
         </main>
     </body>

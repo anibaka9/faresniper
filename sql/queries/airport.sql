@@ -6,6 +6,21 @@ VALUES
 RETURNING
     *;
 
+-- name: GetAirport :one
+SELECT
+    a.id,
+    a.iata,
+    a.name,
+    a.city_id,
+    c.name AS city_name
+FROM
+    airports a
+    JOIN cities c ON a.city_id = c.id
+WHERE
+    a.id = ?
+LIMIT
+    1;
+
 -- name: GetAirportByIata :one
 SELECT
     *

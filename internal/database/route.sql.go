@@ -68,25 +68,62 @@ func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (Route
 
 const getRoute = `-- name: GetRoute :one
 SELECT
-    id, flightsfrom_id, airline_id, airport_from_id, airport_to_id, is_active
+    r.id,
+    r.flightsfrom_id,
+    r.is_active,
+    r.airline_id,
+    ar.name AS airline_name,
+    ar.iata AS airline_iata,
+    r.airport_from_id,
+    af.iata AS airport_from_iata,
+    cf.name AS city_from_name,
+    r.airport_to_id,
+    at.iata AS airport_to_iata,
+    ct.name AS city_to_name
 FROM
-    routes
+    routes r
+    JOIN airlines ar ON ar.id = r.airline_id
+    JOIN airports af ON af.id = r.airport_from_id
+    JOIN airports at ON at.id = r.airport_to_id
+    JOIN cities cf ON cf.id = af.city_id
+    JOIN cities ct ON ct.id = at.city_id
 WHERE
-    routes.id = ?
+    r.id = ?
 LIMIT
     1
 `
 
-func (q *Queries) GetRoute(ctx context.Context, id int64) (Route, error) {
+type GetRouteRow struct {
+	ID              int64
+	FlightsfromID   int64
+	IsActive        bool
+	AirlineID       int64
+	AirlineName     string
+	AirlineIata     string
+	AirportFromID   int64
+	AirportFromIata string
+	CityFromName    string
+	AirportToID     int64
+	AirportToIata   string
+	CityToName      string
+}
+
+func (q *Queries) GetRoute(ctx context.Context, id int64) (GetRouteRow, error) {
 	row := q.db.QueryRowContext(ctx, getRoute, id)
-	var i Route
+	var i GetRouteRow
 	err := row.Scan(
 		&i.ID,
 		&i.FlightsfromID,
-		&i.AirlineID,
-		&i.AirportFromID,
-		&i.AirportToID,
 		&i.IsActive,
+		&i.AirlineID,
+		&i.AirlineName,
+		&i.AirlineIata,
+		&i.AirportFromID,
+		&i.AirportFromIata,
+		&i.CityFromName,
+		&i.AirportToID,
+		&i.AirportToIata,
+		&i.CityToName,
 	)
 	return i, err
 }

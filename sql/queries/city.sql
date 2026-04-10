@@ -6,6 +6,21 @@ VALUES
 RETURNING
     *;
 
+-- name: GetCity :one
+SELECT
+    ct.id,
+    ct.name,
+    ct.country_id,
+    cr.name AS country_name,
+    cr.country_code
+FROM
+    cities ct
+    JOIN countries cr ON ct.country_id = cr.id
+WHERE
+    ct.id = ?
+LIMIT
+    1;
+
 -- name: GetCityByCountyCodeAndName :one
 SELECT
     cities.*

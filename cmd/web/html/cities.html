@@ -18,6 +18,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Country</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,6 +27,9 @@
                             <td>{{ .ID }}</td>
                             <td>{{ .Name }}</td>
                             <td>{{ .CountryName }}</td>
+                            <td>
+                                <a href="/cities/{{ .ID }}" class="btn btn-sm">Open</a>
+                            </td>
                         </tr>
                         {{ end }}
                     </tbody>

@@ -1,0 +1,46 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <base href="/" />
+        <title>Faresniper</title>
+        <link rel="stylesheet" href="./tailwind/output.css" />
+    </head>
+    <body class="h-screen flex">
+        {{ template "sidebar" .}}
+        <main class="p-6 w-full">
+            <div class="mb-6">
+                <a href="/routes" class="btn btn-ghost btn-sm">← Back</a>
+            </div>
+            <h1 class="text-2xl font-bold mb-6">Route #{{ .Route.ID }}</h1>
+            <div class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md">
+                <div class="card-body gap-0 p-0">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
+                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">ID</span>
+                        <span class="font-mono">{{ .Route.ID }}</span>
+                    </div>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
+                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">From</span>
+                        <a href="/airports/{{ .Route.AirportFromID }}" class="link">{{ .Route.CityFromName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .Route.AirportFromIata }}</span></a>
+                    </div>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
+                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">To</span>
+                        <a href="/airports/{{ .Route.AirportToID }}" class="link">{{ .Route.CityToName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .Route.AirportToIata }}</span></a>
+                    </div>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
+                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">Airline</span>
+                        <a href="/airlines/{{ .Route.AirlineID }}" class="link">{{ .Route.AirlineName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .Route.AirlineIata }}</span></a>
+                    </div>
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
+                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">Active</span>
+                        {{ if .Route.IsActive }}
+                        <span class="badge badge-success">Yes</span>
+                        {{ else }}
+                        <span class="badge badge-ghost">No</span>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

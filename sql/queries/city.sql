@@ -35,8 +35,11 @@ LIMIT
 
 -- name: GetCities :many
 SELECT
-    ct.*,
-    cr.name country_name
+    ct.id,
+    ct.name,
+    ct.country_id,
+    cr.name AS country_name,
+    cr.country_code
 FROM
     cities ct
     JOIN countries cr ON ct.country_id = cr.id

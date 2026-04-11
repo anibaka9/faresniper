@@ -7,33 +7,31 @@
     </head>
     <body class="h-screen flex">
         {{ template "sidebar" .}}
-        <main class="p-4 w-full">
-            <h1 class="text-2xl mb-4">Airlines</h1>
-            <div
-                class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full"
-            >
-                <table class="table w-full">
+        <main class="p-6 w-full">
+            <h1 class="text-2xl font-bold mb-6">Airlines</h1>
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full">
+                <table class="table table-hover w-full">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>IATA</th>
                             <th>Name</th>
-                            <th>Acitve</th>
+                            <th>Active</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {{ range .Airlines }}
                         <tr>
-                            <td>{{ .ID }}</td>
-                            <td>{{ .Iata }}</td>
+                            <td><span class="badge badge-outline font-mono">{{ .Iata }}</span></td>
                             <td>{{ .Name }}</td>
                             <td>
-                                {{ if .IsActive }} Yes {{else}} No {{ end }}
+                                {{ if .IsActive }}
+                                <span class="badge badge-success badge-sm">Active</span>
+                                {{ else }}
+                                <span class="badge badge-ghost badge-sm">Inactive</span>
+                                {{ end }}
                             </td>
-                            <td>
-                                <a href="/airlines/{{ .ID }}" class="btn btn-sm">Open</a>
-                            </td>
+                            <td><a href="/airlines/{{ .ID }}" class="btn btn-sm">Open</a></td>
                         </tr>
                         {{ end }}
                     </tbody>

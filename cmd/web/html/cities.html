@@ -7,15 +7,12 @@
     </head>
     <body class="h-screen flex">
         {{ template "sidebar" .}}
-        <main class="p-4 w-full">
-            <h1 class="text-2xl mb-4">Cities</h1>
-            <div
-                class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full"
-            >
-                <table class="table w-full">
+        <main class="p-6 w-full">
+            <h1 class="text-2xl font-bold mb-6">Cities</h1>
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full">
+                <table class="table table-hover w-full">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Country</th>
                             <th></th>
@@ -24,12 +21,12 @@
                     <tbody>
                         {{ range .Cities }}
                         <tr>
-                            <td>{{ .ID }}</td>
                             <td>{{ .Name }}</td>
-                            <td>{{ .CountryName }}</td>
                             <td>
-                                <a href="/cities/{{ .ID }}" class="btn btn-sm">Open</a>
+                                {{ .CountryName }}
+                                <span class="badge badge-outline font-mono badge-sm ml-1">{{ .CountryCode }}</span>
                             </td>
+                            <td><a href="/cities/{{ .ID }}" class="btn btn-sm">Open</a></td>
                         </tr>
                         {{ end }}
                     </tbody>

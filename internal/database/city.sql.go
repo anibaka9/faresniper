@@ -46,8 +46,11 @@ func (q *Queries) CreateCity(ctx context.Context, arg CreateCityParams) (City, e
 
 const getCities = `-- name: GetCities :many
 SELECT
-    ct.id, ct.name, ct.country_id,
-    cr.name country_name
+    ct.id,
+    ct.name,
+    ct.country_id,
+    cr.name AS country_name,
+    cr.country_code
 FROM
     cities ct
     JOIN countries cr ON ct.country_id = cr.id
@@ -65,6 +68,7 @@ type GetCitiesRow struct {
 	Name        string
 	CountryID   int64
 	CountryName string
+	CountryCode string
 }
 
 func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCitiesRow, error) {
@@ -81,6 +85,7 @@ func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCiti
 			&i.Name,
 			&i.CountryID,
 			&i.CountryName,
+			&i.CountryCode,
 		); err != nil {
 			return nil, err
 		}

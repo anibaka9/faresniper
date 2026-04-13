@@ -39,3 +39,14 @@ SELECT
     COUNT(*) AS count_countries
 FROM
     countries;
+
+-- name: UpdateCountry :one
+UPDATE
+    countries
+SET
+    country_code = ?,
+    name = ?
+WHERE
+    id = ?
+RETURNING
+    *;

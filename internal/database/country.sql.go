@@ -116,3 +116,28 @@ func (q *Queries) GetCountryByCode(ctx context.Context, countryCode string) (Cou
 	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
 	return i, err
 }
+
+const updateCountry = `-- name: UpdateCountry :one
+UPDATE
+    countries
+SET
+    country_code = ?,
+    name = ?
+WHERE
+    id = ?
+RETURNING
+    id, country_code, name
+`
+
+type UpdateCountryParams struct {
+	CountryCode string
+	Name        string
+	ID          int64
+}
+
+func (q *Queries) UpdateCountry(ctx context.Context, arg UpdateCountryParams) (Country, error) {
+	row := q.db.QueryRowContext(ctx, updateCountry, arg.CountryCode, arg.Name, arg.ID)
+	var i Country
+	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
+	return i, err
+}

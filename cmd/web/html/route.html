@@ -5,6 +5,10 @@
         <base href="/" />
         <title>Faresniper</title>
         <link rel="stylesheet" href="./tailwind/output.css" />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c0392b'/><text x='50' y='72' font-size='60' font-family='monospace' font-weight='bold' fill='white' text-anchor='middle'>f</text></svg>"
+        />
     </head>
     <body class="h-screen flex">
         {{ template "sidebar" .}}
@@ -13,26 +17,75 @@
                 <a href="/routes" class="btn btn-ghost btn-sm">← Back</a>
             </div>
             <h1 class="text-2xl font-bold mb-6">Route #{{ .Route.ID }}</h1>
-            <div class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md">
+            <div
+                class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md"
+            >
                 <div class="card-body gap-0 p-0">
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">ID</span>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >ID</span
+                        >
                         <span class="font-mono">{{ .Route.ID }}</span>
                     </div>
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">From</span>
-                        <a href="/airports/{{ .Route.AirportFromID }}" class="link">{{ .Route.CityFromName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .Route.AirportFromIata }}</span></a>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >From</span
+                        >
+                        <a
+                            href="/airports/{{ .Route.AirportFromID }}"
+                            class="link"
+                            >{{ .Route.CityFromName }}
+                            <span
+                                class="badge badge-outline font-mono text-xs ml-1"
+                                >{{ .Route.AirportFromIata }}</span
+                            ></a
+                        >
                     </div>
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">To</span>
-                        <a href="/airports/{{ .Route.AirportToID }}" class="link">{{ .Route.CityToName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .Route.AirportToIata }}</span></a>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >To</span
+                        >
+                        <a
+                            href="/airports/{{ .Route.AirportToID }}"
+                            class="link"
+                            >{{ .Route.CityToName }}
+                            <span
+                                class="badge badge-outline font-mono text-xs ml-1"
+                                >{{ .Route.AirportToIata }}</span
+                            ></a
+                        >
                     </div>
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">Airline</span>
-                        <a href="/airlines/{{ .Route.AirlineID }}" class="link">{{ .Route.AirlineName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .Route.AirlineIata }}</span></a>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >Airline</span
+                        >
+                        <a href="/airlines/{{ .Route.AirlineID }}" class="link"
+                            >{{ .Route.AirlineName }}
+                            <span
+                                class="badge badge-outline font-mono text-xs ml-1"
+                                >{{ .Route.AirlineIata }}</span
+                            ></a
+                        >
                     </div>
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">Active</span>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >Active</span
+                        >
                         {{ if .Route.IsActive }}
                         <span class="badge badge-success">Yes</span>
                         {{ else }}

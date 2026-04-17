@@ -2,14 +2,21 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <base href="/" />
         <title>Faresniper</title>
         <link rel="stylesheet" href="tailwind/output.css" />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c0392b'/><text x='50' y='72' font-size='60' font-family='monospace' font-weight='bold' fill='white' text-anchor='middle'>f</text></svg>"
+        />
     </head>
     <body class="h-screen flex">
         {{ template "sidebar" .}}
         <main class="p-6 w-full">
             <h1 class="text-2xl font-bold mb-6">Cities</h1>
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full">
+            <div
+                class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full"
+            >
                 <table class="table table-hover w-full">
                     <thead>
                         <tr>
@@ -24,9 +31,16 @@
                             <td>{{ .Name }}</td>
                             <td>
                                 {{ .CountryName }}
-                                <span class="badge badge-outline font-mono badge-sm ml-1">{{ .CountryCode }}</span>
+                                <span
+                                    class="badge badge-outline font-mono badge-sm ml-1"
+                                    >{{ .CountryCode }}</span
+                                >
                             </td>
-                            <td><a href="/cities/{{ .ID }}" class="btn btn-sm">Open</a></td>
+                            <td>
+                                <a href="/cities/{{ .ID }}" class="btn btn-sm"
+                                    >Open</a
+                                >
+                            </td>
                         </tr>
                         {{ end }}
                     </tbody>

@@ -43,6 +43,7 @@ func main() {
 	r.Post("/countries/{country_id}", server.handleCountryUpdate)
 	r.Get("/airlines/{airline_id}", server.handleAirline)
 	r.Get("/airlines/{airline_id}/edit", server.handleAirlineUpdatePage)
+	r.Post("/airlines/{airline_id}", server.handleAirlineUpdate)
 	r.Get("/airports/{airport_id}", server.handleAirport)
 	r.Get("/cities/{city_id}", server.handleCity)
 	r.Get("/routes/{route_id}", server.handleRoute)

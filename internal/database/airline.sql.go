@@ -152,3 +152,44 @@ func (q *Queries) GetAirlines(ctx context.Context, arg GetAirlinesParams) ([]Air
 	}
 	return items, nil
 }
+
+const updateAirline = `-- name: UpdateAirline :one
+UPDATE
+    airlines
+SET
+    flightsfrom_id = ?,
+    iata = ?,
+    name = ?,
+    is_active = ?
+WHERE
+    id = ?
+RETURNING
+    id, flightsfrom_id, iata, name, is_active
+`
+
+type UpdateAirlineParams struct {
+	FlightsfromID int64
+	Iata          string
+	Name          string
+	IsActive      bool
+	ID            int64
+}
+
+func (q *Queries) UpdateAirline(ctx context.Context, arg UpdateAirlineParams) (Airline, error) {
+	row := q.db.QueryRowContext(ctx, updateAirline,
+		arg.FlightsfromID,
+		arg.Iata,
+		arg.Name,
+		arg.IsActive,
+		arg.ID,
+	)
+	var i Airline
+	err := row.Scan(
+		&i.ID,
+		&i.FlightsfromID,
+		&i.Iata,
+		&i.Name,
+		&i.IsActive,
+	)
+	return i, err
+}

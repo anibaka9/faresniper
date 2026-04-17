@@ -44,3 +44,16 @@ SELECT
     COUNT(*) AS cont_airlines
 FROM
     airlines;
+
+-- name: UpdateAirline :one
+UPDATE
+    airlines
+SET
+    flightsfrom_id = ?,
+    iata = ?,
+    name = ?,
+    is_active = ?
+WHERE
+    id = ?
+RETURNING
+    *;

@@ -5,6 +5,10 @@
         <base href="/" />
         <title>Faresniper</title>
         <link rel="stylesheet" href="./tailwind/output.css" />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c0392b'/><text x='50' y='72' font-size='60' font-family='monospace' font-weight='bold' fill='white' text-anchor='middle'>f</text></svg>"
+        />
     </head>
     <body class="h-screen flex">
         {{ template "sidebar" .}}
@@ -13,19 +17,40 @@
                 <a href="/cities" class="btn btn-ghost btn-sm">← Back</a>
             </div>
             <h1 class="text-2xl font-bold mb-6">{{ .City.Name }}</h1>
-            <div class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md">
+            <div
+                class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md"
+            >
                 <div class="card-body gap-0 p-0">
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">ID</span>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >ID</span
+                        >
                         <span class="font-mono">{{ .City.ID }}</span>
                     </div>
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-base-content/5">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">Name</span>
+                    <div
+                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
+                    >
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >Name</span
+                        >
                         <span>{{ .City.Name }}</span>
                     </div>
                     <div class="flex items-center justify-between px-6 py-4">
-                        <span class="text-sm text-base-content/50 uppercase tracking-wide font-medium">Country</span>
-                        <a href="/countries/{{ .City.CountryID }}" class="link">{{ .City.CountryName }} <span class="badge badge-outline font-mono text-xs ml-1">{{ .City.CountryCode }}</span></a>
+                        <span
+                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
+                            >Country</span
+                        >
+                        <a href="/countries/{{ .City.CountryID }}" class="link"
+                            >{{ .City.CountryName }}
+                            <span
+                                class="badge badge-outline font-mono text-xs ml-1"
+                                >{{ .City.CountryCode }}</span
+                            ></a
+                        >
                     </div>
                 </div>
             </div>

@@ -153,6 +153,44 @@ func (q *Queries) GetAirlines(ctx context.Context, arg GetAirlinesParams) ([]Air
 	return items, nil
 }
 
+const getAllAirlines = `-- name: GetAllAirlines :many
+SELECT
+    id,
+    name,
+    iata
+FROM
+    airlines
+`
+
+type GetAllAirlinesRow struct {
+	ID   int64
+	Name string
+	Iata string
+}
+
+func (q *Queries) GetAllAirlines(ctx context.Context) ([]GetAllAirlinesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllAirlines)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllAirlinesRow
+	for rows.Next() {
+		var i GetAllAirlinesRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Iata); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAirline = `-- name: UpdateAirline :one
 UPDATE
     airlines

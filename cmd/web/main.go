@@ -7,9 +7,12 @@ import (
 	databaseclient "github.com/anibaka9/faresniper/internal/database_client"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/mattn/go-sqlite3"
 )
 
 const Limit int64 = 10
+
+var sqliteErr sqlite3.Error
 
 type Server struct {
 	db *databaseclient.Client
@@ -50,8 +53,9 @@ func main() {
 	r.Get("/cities/{city_id}", server.handleCity)
 	r.Get("/cities/{city_id}/edit", server.handleCityUpdatePage)
 	r.Post("/cities/{city_id}", server.handleCityUpdate)
-
 	r.Get("/routes/{route_id}", server.handleRoute)
+	r.Get("/routes/{route_id}/edit", server.handleRouteUpdatePage)
+	r.Post("/routes/{route_id}", server.handleRouteUpdate)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
 

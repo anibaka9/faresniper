@@ -7,10 +7,7 @@ import (
 
 	"github.com/anibaka9/faresniper/internal/database"
 	"github.com/go-chi/chi/v5"
-	"github.com/mattn/go-sqlite3"
 )
-
-var sqliteErr sqlite3.Error
 
 func (s Server) handleCountryUpdate(w http.ResponseWriter, r *http.Request) {
 	countryId, err := strconv.Atoi(chi.URLParam(r, "country_id"))

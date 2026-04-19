@@ -166,6 +166,45 @@ func (q *Queries) GetAirports(ctx context.Context, arg GetAirportsParams) ([]Get
 	return items, nil
 }
 
+const getAllAirports = `-- name: GetAllAirports :many
+SELECT
+    a.id,
+    c.name city_name,
+    a.iata
+FROM
+    airports a
+    JOIN cities c ON a.city_id = c.id
+`
+
+type GetAllAirportsRow struct {
+	ID       int64
+	CityName string
+	Iata     string
+}
+
+func (q *Queries) GetAllAirports(ctx context.Context) ([]GetAllAirportsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllAirports)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllAirportsRow
+	for rows.Next() {
+		var i GetAllAirportsRow
+		if err := rows.Scan(&i.ID, &i.CityName, &i.Iata); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAirport = `-- name: UpdateAirport :one
 UPDATE
     airports

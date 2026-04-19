@@ -224,3 +224,48 @@ func (q *Queries) GetRoutes(ctx context.Context, arg GetRoutesParams) ([]GetRout
 	}
 	return items, nil
 }
+
+const updateRoute = `-- name: UpdateRoute :one
+UPDATE
+    routes
+SET
+    flightsfrom_id = ?,
+    airline_id = ?,
+    airport_from_id = ?,
+    airport_to_id = ?,
+    is_active = ?
+WHERE
+    id = ?
+RETURNING
+    id, flightsfrom_id, airline_id, airport_from_id, airport_to_id, is_active
+`
+
+type UpdateRouteParams struct {
+	FlightsfromID int64
+	AirlineID     int64
+	AirportFromID int64
+	AirportToID   int64
+	IsActive      bool
+	ID            int64
+}
+
+func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (Route, error) {
+	row := q.db.QueryRowContext(ctx, updateRoute,
+		arg.FlightsfromID,
+		arg.AirlineID,
+		arg.AirportFromID,
+		arg.AirportToID,
+		arg.IsActive,
+		arg.ID,
+	)
+	var i Route
+	err := row.Scan(
+		&i.ID,
+		&i.FlightsfromID,
+		&i.AirlineID,
+		&i.AirportFromID,
+		&i.AirportToID,
+		&i.IsActive,
+	)
+	return i, err
+}

@@ -57,3 +57,11 @@ WHERE
     id = ?
 RETURNING
     *;
+
+-- name: GetAllAirlines :many
+SELECT
+    id,
+    name,
+    iata
+FROM
+    airlines;

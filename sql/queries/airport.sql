@@ -61,3 +61,12 @@ WHERE
     id = ?
 RETURNING
     *;
+
+-- name: GetAllAirports :many
+SELECT
+    a.id,
+    c.name city_name,
+    a.iata
+FROM
+    airports a
+    JOIN cities c ON a.city_id = c.id;

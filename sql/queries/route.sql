@@ -74,3 +74,17 @@ SELECT
     COUNT(*) AS count_routes
 FROM
     routes;
+
+-- name: UpdateRoute :one
+UPDATE
+    routes
+SET
+    flightsfrom_id = ?,
+    airline_id = ?,
+    airport_from_id = ?,
+    airport_to_id = ?,
+    is_active = ?
+WHERE
+    id = ?
+RETURNING
+    *;

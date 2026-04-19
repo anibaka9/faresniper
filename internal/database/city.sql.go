@@ -44,6 +44,43 @@ func (q *Queries) CreateCity(ctx context.Context, arg CreateCityParams) (City, e
 	return i, err
 }
 
+const getAllCities = `-- name: GetAllCities :many
+SELECT
+    ct.id,
+    cr.name || ' - ' || ct.name name
+FROM
+    cities ct
+    JOIN countries cr ON ct.country_id = cr.id
+`
+
+type GetAllCitiesRow struct {
+	ID   int64
+	Name interface{}
+}
+
+func (q *Queries) GetAllCities(ctx context.Context) ([]GetAllCitiesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCities)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllCitiesRow
+	for rows.Next() {
+		var i GetAllCitiesRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCities = `-- name: GetCities :many
 SELECT
     ct.id,
@@ -157,6 +194,31 @@ type GetCityByCountyCodeAndNameParams struct {
 
 func (q *Queries) GetCityByCountyCodeAndName(ctx context.Context, arg GetCityByCountyCodeAndNameParams) (City, error) {
 	row := q.db.QueryRowContext(ctx, getCityByCountyCodeAndName, arg.Name, arg.CountryCode)
+	var i City
+	err := row.Scan(&i.ID, &i.Name, &i.CountryID)
+	return i, err
+}
+
+const updateCity = `-- name: UpdateCity :one
+UPDATE
+    cities
+SET
+    name = ?,
+    country_id = ?
+WHERE
+    id = ?
+RETURNING
+    id, name, country_id
+`
+
+type UpdateCityParams struct {
+	Name      string
+	CountryID int64
+	ID        int64
+}
+
+func (q *Queries) UpdateCity(ctx context.Context, arg UpdateCityParams) (City, error) {
+	row := q.db.QueryRowContext(ctx, updateCity, arg.Name, arg.CountryID, arg.ID)
 	var i City
 	err := row.Scan(&i.ID, &i.Name, &i.CountryID)
 	return i, err

@@ -49,3 +49,15 @@ SELECT
     COUNT(*) AS count_airports
 FROM
     airports;
+
+-- name: UpdateAirport :one
+UPDATE
+    airports
+SET
+    iata = ?,
+    name = ?,
+    city_id = ?
+WHERE
+    id = ?
+RETURNING
+    *;

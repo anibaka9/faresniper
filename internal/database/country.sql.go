@@ -44,6 +44,44 @@ func (q *Queries) CreateCountry(ctx context.Context, arg CreateCountryParams) (C
 	return i, err
 }
 
+const getAllCountries = `-- name: GetAllCountries :many
+SELECT
+    id,
+    name,
+    country_code
+FROM
+    countries
+`
+
+type GetAllCountriesRow struct {
+	ID          int64
+	Name        string
+	CountryCode string
+}
+
+func (q *Queries) GetAllCountries(ctx context.Context) ([]GetAllCountriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllCountries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllCountriesRow
+	for rows.Next() {
+		var i GetAllCountriesRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.CountryCode); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCountries = `-- name: GetCountries :many
 SELECT
     id, country_code, name

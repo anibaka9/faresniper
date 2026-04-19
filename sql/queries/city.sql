@@ -51,3 +51,22 @@ SELECT
     COUNT(*) AS count_cities
 FROM
     cities;
+
+-- name: GetAllCities :many
+SELECT
+    ct.id,
+    cr.name || ' - ' || ct.name name
+FROM
+    cities ct
+    JOIN countries cr ON ct.country_id = cr.id;
+
+-- name: UpdateCity :one
+UPDATE
+    cities
+SET
+    name = ?,
+    country_id = ?
+WHERE
+    id = ?
+RETURNING
+    *;

@@ -165,3 +165,40 @@ func (q *Queries) GetAirports(ctx context.Context, arg GetAirportsParams) ([]Get
 	}
 	return items, nil
 }
+
+const updateAirport = `-- name: UpdateAirport :one
+UPDATE
+    airports
+SET
+    iata = ?,
+    name = ?,
+    city_id = ?
+WHERE
+    id = ?
+RETURNING
+    id, iata, name, city_id
+`
+
+type UpdateAirportParams struct {
+	Iata   string
+	Name   string
+	CityID int64
+	ID     int64
+}
+
+func (q *Queries) UpdateAirport(ctx context.Context, arg UpdateAirportParams) (Airport, error) {
+	row := q.db.QueryRowContext(ctx, updateAirport,
+		arg.Iata,
+		arg.Name,
+		arg.CityID,
+		arg.ID,
+	)
+	var i Airport
+	err := row.Scan(
+		&i.ID,
+		&i.Iata,
+		&i.Name,
+		&i.CityID,
+	)
+	return i, err
+}

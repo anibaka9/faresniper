@@ -50,3 +50,11 @@ WHERE
     id = ?
 RETURNING
     *;
+
+-- name: GetAllCountries :many
+SELECT
+    id,
+    name,
+    country_code
+FROM
+    countries;

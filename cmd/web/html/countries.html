@@ -2,7 +2,6 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <base href="/" />
         <title>Faresniper</title>
         <link rel="stylesheet" href="tailwind/output.css" />
         <link
@@ -39,6 +38,11 @@
                                     href="/countries/{{ .ID }}"
                                     class="btn btn-sm"
                                     >Open</a
+                                >
+                                <a
+                                    href="/countries/{{ .ID }}/edit"
+                                    class="btn btn-sm"
+                                    >Edit</a
                                 >
                             </td>
                         </tr>

@@ -45,7 +45,12 @@ func main() {
 	r.Get("/airlines/{airline_id}/edit", server.handleAirlineUpdatePage)
 	r.Post("/airlines/{airline_id}", server.handleAirlineUpdate)
 	r.Get("/airports/{airport_id}", server.handleAirport)
+	r.Get("/airports/{airport_id}/edit", server.handleAirportUpdatePage)
+	r.Post("/airports/{airport_id}", server.handleAirportUpdate)
 	r.Get("/cities/{city_id}", server.handleCity)
+	r.Get("/cities/{city_id}/edit", server.handleCityUpdatePage)
+	r.Post("/cities/{city_id}", server.handleCityUpdate)
+
 	r.Get("/routes/{route_id}", server.handleRoute)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))

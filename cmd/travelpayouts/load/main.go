@@ -9,18 +9,16 @@ import (
 )
 
 const (
-	origin      = "BSZ"
-	destination = "ALA"
-	month       = "2026-05-01"
+	origin = "BSZ"
 )
 
 func main() {
-	data, err := travelpayouts.GetCalendar(origin, destination, month)
+	data, err := travelpayouts.GetPrices(origin)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fileName := fmt.Sprintf("data/travelpayouts/%s-%s-%s.json", origin, destination, month)
+	fileName := fmt.Sprintf("data/travelpayouts/%s.json", origin)
 	if err := os.WriteFile(fileName, data, 0o666); err != nil {
 		log.Fatal("coudnt write data", err)
 	}

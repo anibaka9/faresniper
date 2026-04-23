@@ -6,23 +6,13 @@ VALUES
 RETURNING
     *;
 
--- name: GetCountryByCode :one
-SELECT
-    *
-FROM
-    countries
-WHERE
-    country_code = ?
-LIMIT
-    1;
-
 -- name: GetCountry :one
 SELECT
     *
 FROM
     countries
 WHERE
-    id = ?
+    country_code = ?
 LIMIT
     1;
 
@@ -44,16 +34,14 @@ FROM
 UPDATE
     countries
 SET
-    country_code = ?,
     name = ?
 WHERE
-    id = ?
+    country_code = ?
 RETURNING
     *;
 
 -- name: GetAllCountries :many
 SELECT
-    id,
     name,
     country_code
 FROM

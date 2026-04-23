@@ -1,48 +1,34 @@
 -- name: CreateCity :one
 INSERT INTO
-    cities (name, country_id)
+    cities (iata, name, country_code)
 VALUES
-    (?, ?)
+    (?, ?, ?)
 RETURNING
     *;
 
 -- name: GetCity :one
 SELECT
-    ct.id,
+    ct.iata,
     ct.name,
-    ct.country_id,
-    cr.name AS country_name,
-    cr.country_code
+    ct.country_code,
+    cr.name AS country_name
 FROM
     cities ct
-    JOIN countries cr ON ct.country_id = cr.id
+    JOIN countries cr ON ct.country_code = cr.code
 WHERE
-    ct.id = ?
-LIMIT
-    1;
-
--- name: GetCityByCountyCodeAndName :one
-SELECT
-    cities.*
-FROM
-    cities
-    JOIN countries ON cities.country_id = countries.id
-WHERE
-    cities.name = ?
-    AND countries.country_code = ?
+    ct.iata = ?
 LIMIT
     1;
 
 -- name: GetCities :many
 SELECT
-    ct.id,
+    ct.iata,
     ct.name,
-    ct.country_id,
+    ct.country_code,
     cr.name AS country_name,
-    cr.country_code
 FROM
     cities ct
-    JOIN countries cr ON ct.country_id = cr.id
+    JOIN countries cr ON ct.country_code = cr.code
 LIMIT
     ? OFFSET ?;
 
@@ -54,19 +40,19 @@ FROM
 
 -- name: GetAllCities :many
 SELECT
-    ct.id,
+    ct.iata,
     cr.name || ' - ' || ct.name name
 FROM
     cities ct
-    JOIN countries cr ON ct.country_id = cr.id;
+    JOIN countries cr ON ct.country_code = cr.code;
 
 -- name: UpdateCity :one
 UPDATE
     cities
 SET
     name = ?,
-    country_id = ?
+    country_code = ?
 WHERE
-    id = ?
+    iata = ?
 RETURNING
     *;

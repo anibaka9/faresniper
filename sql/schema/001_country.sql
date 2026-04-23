@@ -1,7 +1,6 @@
 -- +goose Up
 CREATE TABLE countries (
-    id INTEGER PRIMARY KEY,
-    country_code TEXT UNIQUE NOT NULL,
+    country_code TEXT PRIMARY KEY,
     name TEXT NOT NULL
 );
 

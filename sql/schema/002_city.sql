@@ -1,10 +1,9 @@
 -- +goose Up
 CREATE TABLE cities (
-    id INTEGER PRIMARY KEY,
+    iata TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    country_id INTEGER NOT NULL,
-    FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE CASCADE,
-    UNIQUE (name, country_id)
+    country_code TEXT NOT NULL,
+    FOREIGN KEY (country_code) REFERENCES countries(code) ON DELETE CASCADE,
 );
 
 -- +goose Down

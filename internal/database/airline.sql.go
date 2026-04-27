@@ -11,108 +11,61 @@ import (
 
 const countAirlines = `-- name: CountAirlines :one
 SELECT
-    COUNT(*) AS cont_airlines
+    COUNT(*) AS count_airlines
 FROM
     airlines
 `
 
 func (q *Queries) CountAirlines(ctx context.Context) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countAirlines)
-	var cont_airlines int64
-	err := row.Scan(&cont_airlines)
-	return cont_airlines, err
+	var count_airlines int64
+	err := row.Scan(&count_airlines)
+	return count_airlines, err
 }
 
 const createAirline = `-- name: CreateAirline :one
 INSERT INTO
-    airlines (
-        flightsfrom_id,
-        iata,
-        name,
-        is_active
-    )
+    airlines (iata, name, is_lowcost)
 VALUES
-    (?, ?, ?, ?)
+    (?, ?, ?)
 RETURNING
-    id, flightsfrom_id, iata, name, is_active
+    iata, name, is_lowcost
 `
 
 type CreateAirlineParams struct {
-	FlightsfromID int64
-	Iata          string
-	Name          string
-	IsActive      bool
+	Iata      string
+	Name      string
+	IsLowcost bool
 }
 
 func (q *Queries) CreateAirline(ctx context.Context, arg CreateAirlineParams) (Airline, error) {
-	row := q.db.QueryRowContext(ctx, createAirline,
-		arg.FlightsfromID,
-		arg.Iata,
-		arg.Name,
-		arg.IsActive,
-	)
+	row := q.db.QueryRowContext(ctx, createAirline, arg.Iata, arg.Name, arg.IsLowcost)
 	var i Airline
-	err := row.Scan(
-		&i.ID,
-		&i.FlightsfromID,
-		&i.Iata,
-		&i.Name,
-		&i.IsActive,
-	)
+	err := row.Scan(&i.Iata, &i.Name, &i.IsLowcost)
 	return i, err
 }
 
 const getAirline = `-- name: GetAirline :one
 SELECT
-    id, flightsfrom_id, iata, name, is_active
+    iata, name, is_lowcost
 FROM
     airlines
 WHERE
-    airlines.id = ?
+    iata = ?
 LIMIT
     1
 `
 
-func (q *Queries) GetAirline(ctx context.Context, id int64) (Airline, error) {
-	row := q.db.QueryRowContext(ctx, getAirline, id)
+func (q *Queries) GetAirline(ctx context.Context, iata string) (Airline, error) {
+	row := q.db.QueryRowContext(ctx, getAirline, iata)
 	var i Airline
-	err := row.Scan(
-		&i.ID,
-		&i.FlightsfromID,
-		&i.Iata,
-		&i.Name,
-		&i.IsActive,
-	)
-	return i, err
-}
-
-const getAirlineByFlightsFromId = `-- name: GetAirlineByFlightsFromId :one
-SELECT
-    id, flightsfrom_id, iata, name, is_active
-FROM
-    airlines
-WHERE
-    airlines.flightsfrom_id = ?
-LIMIT
-    1
-`
-
-func (q *Queries) GetAirlineByFlightsFromId(ctx context.Context, flightsfromID int64) (Airline, error) {
-	row := q.db.QueryRowContext(ctx, getAirlineByFlightsFromId, flightsfromID)
-	var i Airline
-	err := row.Scan(
-		&i.ID,
-		&i.FlightsfromID,
-		&i.Iata,
-		&i.Name,
-		&i.IsActive,
-	)
+	err := row.Scan(&i.Iata, &i.Name, &i.IsLowcost)
 	return i, err
 }
 
 const getAirlines = `-- name: GetAirlines :many
 SELECT
-    id, flightsfrom_id, iata, name, is_active
+    iata, name, is_lowcost
 FROM
     airlines
 LIMIT
@@ -133,13 +86,7 @@ func (q *Queries) GetAirlines(ctx context.Context, arg GetAirlinesParams) ([]Air
 	var items []Airline
 	for rows.Next() {
 		var i Airline
-		if err := rows.Scan(
-			&i.ID,
-			&i.FlightsfromID,
-			&i.Iata,
-			&i.Name,
-			&i.IsActive,
-		); err != nil {
+		if err := rows.Scan(&i.Iata, &i.Name, &i.IsLowcost); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -155,17 +102,15 @@ func (q *Queries) GetAirlines(ctx context.Context, arg GetAirlinesParams) ([]Air
 
 const getAllAirlines = `-- name: GetAllAirlines :many
 SELECT
-    id,
-    name,
-    iata
+    iata,
+    name
 FROM
     airlines
 `
 
 type GetAllAirlinesRow struct {
-	ID   int64
-	Name string
 	Iata string
+	Name string
 }
 
 func (q *Queries) GetAllAirlines(ctx context.Context) ([]GetAllAirlinesRow, error) {
@@ -177,7 +122,7 @@ func (q *Queries) GetAllAirlines(ctx context.Context) ([]GetAllAirlinesRow, erro
 	var items []GetAllAirlinesRow
 	for rows.Next() {
 		var i GetAllAirlinesRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.Iata); err != nil {
+		if err := rows.Scan(&i.Iata, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -195,39 +140,23 @@ const updateAirline = `-- name: UpdateAirline :one
 UPDATE
     airlines
 SET
-    flightsfrom_id = ?,
-    iata = ?,
     name = ?,
-    is_active = ?
+    is_lowcost = ?
 WHERE
-    id = ?
+    iata = ?
 RETURNING
-    id, flightsfrom_id, iata, name, is_active
+    iata, name, is_lowcost
 `
 
 type UpdateAirlineParams struct {
-	FlightsfromID int64
-	Iata          string
-	Name          string
-	IsActive      bool
-	ID            int64
+	Name      string
+	IsLowcost bool
+	Iata      string
 }
 
 func (q *Queries) UpdateAirline(ctx context.Context, arg UpdateAirlineParams) (Airline, error) {
-	row := q.db.QueryRowContext(ctx, updateAirline,
-		arg.FlightsfromID,
-		arg.Iata,
-		arg.Name,
-		arg.IsActive,
-		arg.ID,
-	)
+	row := q.db.QueryRowContext(ctx, updateAirline, arg.Name, arg.IsLowcost, arg.Iata)
 	var i Airline
-	err := row.Scan(
-		&i.ID,
-		&i.FlightsfromID,
-		&i.Iata,
-		&i.Name,
-		&i.IsActive,
-	)
+	err := row.Scan(&i.Iata, &i.Name, &i.IsLowcost)
 	return i, err
 }

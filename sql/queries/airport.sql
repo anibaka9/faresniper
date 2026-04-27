@@ -1,46 +1,38 @@
 -- name: CreateAirport :one
 INSERT INTO
-    airports (iata, name, city_id)
+    airports (iata, name, iata_type, flightable, city_iata)
 VALUES
-    (?, ?, ?)
+    (?, ?, ?, ?, ?)
 RETURNING
     *;
 
 -- name: GetAirport :one
 SELECT
-    a.id,
     a.iata,
     a.name,
-    a.city_id,
+    a.iata_type,
+    a.flightable,
+    a.city_iata,
     c.name AS city_name
 FROM
     airports a
-    JOIN cities c ON a.city_id = c.id
+    JOIN cities c ON a.city_iata = c.iata
 WHERE
-    a.id = ?
-LIMIT
-    1;
-
--- name: GetAirportByIata :one
-SELECT
-    *
-FROM
-    airports
-WHERE
-    airports.iata = ?
+    a.iata = ?
 LIMIT
     1;
 
 -- name: GetAirports :many
 SELECT
-    a.id,
     a.iata,
     a.name,
-    a.city_id,
-    c.name city_name
+    a.iata_type,
+    a.flightable,
+    a.city_iata,
+    c.name AS city_name
 FROM
     airports a
-    JOIN cities c ON a.city_id = c.id
+    JOIN cities c ON a.city_iata = c.iata
 LIMIT
     ? OFFSET ?;
 
@@ -54,19 +46,19 @@ FROM
 UPDATE
     airports
 SET
-    iata = ?,
     name = ?,
-    city_id = ?
+    iata_type = ?,
+    flightable = ?,
+    city_iata = ?
 WHERE
-    id = ?
+    iata = ?
 RETURNING
     *;
 
 -- name: GetAllAirports :many
 SELECT
-    a.id,
-    c.name city_name,
-    a.iata
+    a.iata,
+    c.name AS city_name
 FROM
     airports a
-    JOIN cities c ON a.city_id = c.id;
+    JOIN cities c ON a.city_iata = c.iata;

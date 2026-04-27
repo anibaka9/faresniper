@@ -4,12 +4,6 @@ SELECT
         SELECT
             COUNT(*)
         FROM
-            routes
-    ) AS routes_num,
-    (
-        SELECT
-            COUNT(*)
-        FROM
             airlines
     ) AS airlines_num,
     (

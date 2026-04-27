@@ -25,7 +25,7 @@ SELECT
     ct.iata,
     ct.name,
     ct.country_code,
-    cr.name AS country_name,
+    cr.name AS country_name
 FROM
     cities ct
     JOIN countries cr ON ct.country_code = cr.code

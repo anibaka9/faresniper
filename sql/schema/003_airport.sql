@@ -1,10 +1,11 @@
 -- +goose Up
 CREATE TABLE airports (
-    id INTEGER PRIMARY KEY,
-    iata TEXT UNIQUE NOT NULL,
+    iata TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    city_id INTEGER NOT NULL,
-    FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE CASCADE
+    iata_type TEXT NOT NULL,
+    flightable BOOLEAN NOT NULL,
+    city_iata TEXT NOT NULL,
+    FOREIGN KEY (city_iata) REFERENCES cities(iata) ON DELETE CASCADE
 );
 
 -- +goose Down

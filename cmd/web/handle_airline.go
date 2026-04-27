@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 	"text/template"
 
 	"github.com/anibaka9/faresniper/internal/database"
@@ -16,13 +15,13 @@ func (s Server) handleAirline(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	airlineId, err := strconv.Atoi(chi.URLParam(r, "airline_id"))
-	if err != nil {
+	iata := chi.URLParam(r, "airline_id")
+	if iata == "" {
 		http.Error(w, "wrong airline id", http.StatusBadRequest)
 		return
 	}
 
-	airline, err := s.db.Queries.GetAirline(r.Context(), int64(airlineId))
+	airline, err := s.db.Queries.GetAirline(r.Context(), iata)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -5,37 +5,26 @@
 package database
 
 type Airline struct {
-	ID            int64
-	FlightsfromID int64
-	Iata          string
-	Name          string
-	IsActive      bool
+	Iata      string
+	Name      string
+	IsLowcost bool
 }
 
 type Airport struct {
-	ID     int64
-	Iata   string
-	Name   string
-	CityID int64
+	Iata       string
+	Name       string
+	IataType   string
+	Flightable bool
+	CityIata   string
 }
 
 type City struct {
-	ID        int64
-	Name      string
-	CountryID int64
+	Iata        string
+	Name        string
+	CountryCode string
 }
 
 type Country struct {
-	ID          int64
-	CountryCode string
-	Name        string
-}
-
-type Route struct {
-	ID            int64
-	FlightsfromID int64
-	AirlineID     int64
-	AirportFromID int64
-	AirportToID   int64
-	IsActive      bool
+	Code string
+	Name string
 }

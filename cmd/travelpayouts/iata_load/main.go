@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/anibaka9/faresniper/internal/travelpayouts"
 )
 
 const (
@@ -32,6 +34,8 @@ func downloadFile(url string, filepath string) error {
 }
 
 func main() {
+	log.Println("Downloading reference data...")
+
 	err := downloadFile(countries_link, "data/iata/countries.json")
 	if err != nil {
 		log.Fatal(err)
@@ -40,7 +44,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = downloadFile(airport_link, "data/iata/airport.json")
+	err = downloadFile(airport_link, "data/iata/airports.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,4 +52,28 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("Saving to database...")
+
+	if err := travelpayouts.SaveCountries(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Countries saved")
+
+	if err := travelpayouts.SaveCities(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Cities saved")
+
+	if err := travelpayouts.SaveAirports(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Airports saved")
+
+	if err := travelpayouts.SaveAirlines(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Airlines saved")
+
+	log.Println("Done")
 }

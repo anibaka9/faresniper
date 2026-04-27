@@ -36,7 +36,6 @@ func main() {
 	r.Use(middleware.Logger)
 
 	r.Get("/", server.handleIndex)
-	r.Get("/routes", server.handleRoutes)
 	r.Get("/airlines", server.handleAirlines)
 	r.Get("/airports", server.handleAirports)
 	r.Get("/cities", server.handleCities)
@@ -53,9 +52,6 @@ func main() {
 	r.Get("/cities/{city_id}", server.handleCity)
 	r.Get("/cities/{city_id}/edit", server.handleCityUpdatePage)
 	r.Post("/cities/{city_id}", server.handleCityUpdate)
-	r.Get("/routes/{route_id}", server.handleRoute)
-	r.Get("/routes/{route_id}/edit", server.handleRouteUpdatePage)
-	r.Post("/routes/{route_id}", server.handleRouteUpdate)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
 

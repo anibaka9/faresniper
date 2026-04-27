@@ -1,6 +1,6 @@
 -- name: CreateCountry :one
 INSERT INTO
-    countries (country_code, name)
+    countries (code, name)
 VALUES
     (?, ?)
 RETURNING
@@ -12,7 +12,7 @@ SELECT
 FROM
     countries
 WHERE
-    country_code = ?
+    code = ?
 LIMIT
     1;
 
@@ -36,13 +36,13 @@ UPDATE
 SET
     name = ?
 WHERE
-    country_code = ?
+    code = ?
 RETURNING
     *;
 
 -- name: GetAllCountries :many
 SELECT
     name,
-    country_code
+    code
 FROM
     countries;

@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 	"text/template"
 
 	"github.com/anibaka9/faresniper/internal/database"
@@ -16,13 +15,13 @@ func (s Server) handleCountry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	countryId, err := strconv.Atoi(chi.URLParam(r, "country_id"))
-	if err != nil {
-		http.Error(w, "wrong county id", http.StatusBadRequest)
+	code := chi.URLParam(r, "country_id")
+	if code == "" {
+		http.Error(w, "wrong country id", http.StatusBadRequest)
 		return
 	}
 
-	country, err := s.db.Queries.GetCountry(r.Context(), int64(countryId))
+	country, err := s.db.Queries.GetCountry(r.Context(), code)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

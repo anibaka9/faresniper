@@ -1,25 +1,10 @@
 -- name: CreateAirline :one
 INSERT INTO
-    airlines (
-        flightsfrom_id,
-        iata,
-        name,
-        is_active
-    )
+    airlines (iata, name, is_lowcost)
 VALUES
-    (?, ?, ?, ?)
+    (?, ?, ?)
 RETURNING
     *;
-
--- name: GetAirlineByFlightsFromId :one
-SELECT
-    *
-FROM
-    airlines
-WHERE
-    airlines.flightsfrom_id = ?
-LIMIT
-    1;
 
 -- name: GetAirline :one
 SELECT
@@ -27,7 +12,7 @@ SELECT
 FROM
     airlines
 WHERE
-    airlines.id = ?
+    iata = ?
 LIMIT
     1;
 
@@ -41,7 +26,7 @@ LIMIT
 
 -- name: CountAirlines :one
 SELECT
-    COUNT(*) AS cont_airlines
+    COUNT(*) AS count_airlines
 FROM
     airlines;
 
@@ -49,19 +34,16 @@ FROM
 UPDATE
     airlines
 SET
-    flightsfrom_id = ?,
-    iata = ?,
     name = ?,
-    is_active = ?
+    is_lowcost = ?
 WHERE
-    id = ?
+    iata = ?
 RETURNING
     *;
 
 -- name: GetAllAirlines :many
 SELECT
-    id,
-    name,
-    iata
+    iata,
+    name
 FROM
     airlines;

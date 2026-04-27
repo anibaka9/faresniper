@@ -25,38 +25,36 @@ func (q *Queries) CountCountries(ctx context.Context) (int64, error) {
 
 const createCountry = `-- name: CreateCountry :one
 INSERT INTO
-    countries (country_code, name)
+    countries (code, name)
 VALUES
     (?, ?)
 RETURNING
-    id, country_code, name
+    code, name
 `
 
 type CreateCountryParams struct {
-	CountryCode string
-	Name        string
+	Code string
+	Name string
 }
 
 func (q *Queries) CreateCountry(ctx context.Context, arg CreateCountryParams) (Country, error) {
-	row := q.db.QueryRowContext(ctx, createCountry, arg.CountryCode, arg.Name)
+	row := q.db.QueryRowContext(ctx, createCountry, arg.Code, arg.Name)
 	var i Country
-	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
+	err := row.Scan(&i.Code, &i.Name)
 	return i, err
 }
 
 const getAllCountries = `-- name: GetAllCountries :many
 SELECT
-    id,
     name,
-    country_code
+    code
 FROM
     countries
 `
 
 type GetAllCountriesRow struct {
-	ID          int64
-	Name        string
-	CountryCode string
+	Name string
+	Code string
 }
 
 func (q *Queries) GetAllCountries(ctx context.Context) ([]GetAllCountriesRow, error) {
@@ -68,7 +66,7 @@ func (q *Queries) GetAllCountries(ctx context.Context) ([]GetAllCountriesRow, er
 	var items []GetAllCountriesRow
 	for rows.Next() {
 		var i GetAllCountriesRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.CountryCode); err != nil {
+		if err := rows.Scan(&i.Name, &i.Code); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -84,7 +82,7 @@ func (q *Queries) GetAllCountries(ctx context.Context) ([]GetAllCountriesRow, er
 
 const getCountries = `-- name: GetCountries :many
 SELECT
-    id, country_code, name
+    code, name
 FROM
     countries
 LIMIT
@@ -105,7 +103,7 @@ func (q *Queries) GetCountries(ctx context.Context, arg GetCountriesParams) ([]C
 	var items []Country
 	for rows.Next() {
 		var i Country
-		if err := rows.Scan(&i.ID, &i.CountryCode, &i.Name); err != nil {
+		if err := rows.Scan(&i.Code, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -121,37 +119,19 @@ func (q *Queries) GetCountries(ctx context.Context, arg GetCountriesParams) ([]C
 
 const getCountry = `-- name: GetCountry :one
 SELECT
-    id, country_code, name
+    code, name
 FROM
     countries
 WHERE
-    id = ?
+    code = ?
 LIMIT
     1
 `
 
-func (q *Queries) GetCountry(ctx context.Context, id int64) (Country, error) {
-	row := q.db.QueryRowContext(ctx, getCountry, id)
+func (q *Queries) GetCountry(ctx context.Context, code string) (Country, error) {
+	row := q.db.QueryRowContext(ctx, getCountry, code)
 	var i Country
-	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
-	return i, err
-}
-
-const getCountryByCode = `-- name: GetCountryByCode :one
-SELECT
-    id, country_code, name
-FROM
-    countries
-WHERE
-    country_code = ?
-LIMIT
-    1
-`
-
-func (q *Queries) GetCountryByCode(ctx context.Context, countryCode string) (Country, error) {
-	row := q.db.QueryRowContext(ctx, getCountryByCode, countryCode)
-	var i Country
-	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
+	err := row.Scan(&i.Code, &i.Name)
 	return i, err
 }
 
@@ -159,23 +139,21 @@ const updateCountry = `-- name: UpdateCountry :one
 UPDATE
     countries
 SET
-    country_code = ?,
     name = ?
 WHERE
-    id = ?
+    code = ?
 RETURNING
-    id, country_code, name
+    code, name
 `
 
 type UpdateCountryParams struct {
-	CountryCode string
-	Name        string
-	ID          int64
+	Name string
+	Code string
 }
 
 func (q *Queries) UpdateCountry(ctx context.Context, arg UpdateCountryParams) (Country, error) {
-	row := q.db.QueryRowContext(ctx, updateCountry, arg.CountryCode, arg.Name, arg.ID)
+	row := q.db.QueryRowContext(ctx, updateCountry, arg.Name, arg.Code)
 	var i Country
-	err := row.Scan(&i.ID, &i.CountryCode, &i.Name)
+	err := row.Scan(&i.Code, &i.Name)
 	return i, err
 }

@@ -12,10 +12,6 @@ var sidebar = []SidebarItem{
 		Link:  "/",
 	},
 	{
-		Title: "Routes",
-		Link:  "/routes",
-	},
-	{
 		Title: "Airlines",
 		Link:  "/airlines",
 	},

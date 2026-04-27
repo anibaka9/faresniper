@@ -21,7 +21,7 @@
                         <tr>
                             <th>IATA</th>
                             <th>Name</th>
-                            <th>Active</th>
+                            <th>Lowcost</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -35,22 +35,22 @@
                             </td>
                             <td>{{ .Name }}</td>
                             <td>
-                                {{ if .IsActive }}
+                                {{ if .IsLowcost }}
                                 <span class="badge badge-success badge-sm"
-                                    >Active</span
+                                    >Yes</span
                                 >
                                 {{ else }}
                                 <span class="badge badge-ghost badge-sm"
-                                    >Inactive</span
+                                    >No</span
                                 >
                                 {{ end }}
                             </td>
                             <td>
-                                <a href="/airlines/{{ .ID }}" class="btn btn-sm"
+                                <a href="/airlines/{{ .Iata }}" class="btn btn-sm"
                                     >Open</a
                                 >
                                 <a
-                                    href="/airlines/{{ .ID }}/edit"
+                                    href="/airlines/{{ .Iata }}/edit"
                                     class="btn btn-sm"
                                     >Edit</a
                                 >

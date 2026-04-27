@@ -1,10 +1,8 @@
 -- +goose Up
 CREATE TABLE airlines (
-    id INTEGER PRIMARY KEY,
-    flightsfrom_id INTEGER UNIQUE NOT NULL,
-    iata TEXT NOT NULL,
+    iata TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    is_active BOOLEAN NOT NULL
+    is_lowcost BOOLEAN NOT NULL
 );
 
 -- +goose Down

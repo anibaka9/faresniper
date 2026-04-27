@@ -15,12 +15,6 @@ SELECT
         SELECT
             COUNT(*)
         FROM
-            routes
-    ) AS routes_num,
-    (
-        SELECT
-            COUNT(*)
-        FROM
             airlines
     ) AS airlines_num,
     (
@@ -44,7 +38,6 @@ SELECT
 `
 
 type GetStatsRow struct {
-	RoutesNum    int64
 	AirlinesNum  int64
 	AirportsNum  int64
 	CitiesNum    int64
@@ -55,7 +48,6 @@ func (q *Queries) GetStats(ctx context.Context) (GetStatsRow, error) {
 	row := q.db.QueryRowContext(ctx, getStats)
 	var i GetStatsRow
 	err := row.Scan(
-		&i.RoutesNum,
 		&i.AirlinesNum,
 		&i.AirportsNum,
 		&i.CitiesNum,

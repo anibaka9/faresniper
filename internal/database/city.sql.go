@@ -25,36 +25,37 @@ func (q *Queries) CountCities(ctx context.Context) (int64, error) {
 
 const createCity = `-- name: CreateCity :one
 INSERT INTO
-    cities (name, country_id)
+    cities (iata, name, country_code)
 VALUES
-    (?, ?)
+    (?, ?, ?)
 RETURNING
-    id, name, country_id
+    iata, name, country_code
 `
 
 type CreateCityParams struct {
-	Name      string
-	CountryID int64
+	Iata        string
+	Name        string
+	CountryCode string
 }
 
 func (q *Queries) CreateCity(ctx context.Context, arg CreateCityParams) (City, error) {
-	row := q.db.QueryRowContext(ctx, createCity, arg.Name, arg.CountryID)
+	row := q.db.QueryRowContext(ctx, createCity, arg.Iata, arg.Name, arg.CountryCode)
 	var i City
-	err := row.Scan(&i.ID, &i.Name, &i.CountryID)
+	err := row.Scan(&i.Iata, &i.Name, &i.CountryCode)
 	return i, err
 }
 
 const getAllCities = `-- name: GetAllCities :many
 SELECT
-    ct.id,
+    ct.iata,
     cr.name || ' - ' || ct.name name
 FROM
     cities ct
-    JOIN countries cr ON ct.country_id = cr.id
+    JOIN countries cr ON ct.country_code = cr.code
 `
 
 type GetAllCitiesRow struct {
-	ID   int64
+	Iata string
 	Name interface{}
 }
 
@@ -67,7 +68,7 @@ func (q *Queries) GetAllCities(ctx context.Context) ([]GetAllCitiesRow, error) {
 	var items []GetAllCitiesRow
 	for rows.Next() {
 		var i GetAllCitiesRow
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.Iata, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -83,14 +84,13 @@ func (q *Queries) GetAllCities(ctx context.Context) ([]GetAllCitiesRow, error) {
 
 const getCities = `-- name: GetCities :many
 SELECT
-    ct.id,
+    ct.iata,
     ct.name,
-    ct.country_id,
-    cr.name AS country_name,
-    cr.country_code
+    ct.country_code,
+    cr.name AS country_name
 FROM
     cities ct
-    JOIN countries cr ON ct.country_id = cr.id
+    JOIN countries cr ON ct.country_code = cr.code
 LIMIT
     ? OFFSET ?
 `
@@ -101,11 +101,10 @@ type GetCitiesParams struct {
 }
 
 type GetCitiesRow struct {
-	ID          int64
+	Iata        string
 	Name        string
-	CountryID   int64
-	CountryName string
 	CountryCode string
+	CountryName string
 }
 
 func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCitiesRow, error) {
@@ -118,11 +117,10 @@ func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCiti
 	for rows.Next() {
 		var i GetCitiesRow
 		if err := rows.Scan(
-			&i.ID,
+			&i.Iata,
 			&i.Name,
-			&i.CountryID,
-			&i.CountryName,
 			&i.CountryCode,
+			&i.CountryName,
 		); err != nil {
 			return nil, err
 		}
@@ -139,63 +137,35 @@ func (q *Queries) GetCities(ctx context.Context, arg GetCitiesParams) ([]GetCiti
 
 const getCity = `-- name: GetCity :one
 SELECT
-    ct.id,
+    ct.iata,
     ct.name,
-    ct.country_id,
-    cr.name AS country_name,
-    cr.country_code
+    ct.country_code,
+    cr.name AS country_name
 FROM
     cities ct
-    JOIN countries cr ON ct.country_id = cr.id
+    JOIN countries cr ON ct.country_code = cr.code
 WHERE
-    ct.id = ?
+    ct.iata = ?
 LIMIT
     1
 `
 
 type GetCityRow struct {
-	ID          int64
+	Iata        string
 	Name        string
-	CountryID   int64
-	CountryName string
 	CountryCode string
+	CountryName string
 }
 
-func (q *Queries) GetCity(ctx context.Context, id int64) (GetCityRow, error) {
-	row := q.db.QueryRowContext(ctx, getCity, id)
+func (q *Queries) GetCity(ctx context.Context, iata string) (GetCityRow, error) {
+	row := q.db.QueryRowContext(ctx, getCity, iata)
 	var i GetCityRow
 	err := row.Scan(
-		&i.ID,
+		&i.Iata,
 		&i.Name,
-		&i.CountryID,
-		&i.CountryName,
 		&i.CountryCode,
+		&i.CountryName,
 	)
-	return i, err
-}
-
-const getCityByCountyCodeAndName = `-- name: GetCityByCountyCodeAndName :one
-SELECT
-    cities.id, cities.name, cities.country_id
-FROM
-    cities
-    JOIN countries ON cities.country_id = countries.id
-WHERE
-    cities.name = ?
-    AND countries.country_code = ?
-LIMIT
-    1
-`
-
-type GetCityByCountyCodeAndNameParams struct {
-	Name        string
-	CountryCode string
-}
-
-func (q *Queries) GetCityByCountyCodeAndName(ctx context.Context, arg GetCityByCountyCodeAndNameParams) (City, error) {
-	row := q.db.QueryRowContext(ctx, getCityByCountyCodeAndName, arg.Name, arg.CountryCode)
-	var i City
-	err := row.Scan(&i.ID, &i.Name, &i.CountryID)
 	return i, err
 }
 
@@ -204,22 +174,22 @@ UPDATE
     cities
 SET
     name = ?,
-    country_id = ?
+    country_code = ?
 WHERE
-    id = ?
+    iata = ?
 RETURNING
-    id, name, country_id
+    iata, name, country_code
 `
 
 type UpdateCityParams struct {
-	Name      string
-	CountryID int64
-	ID        int64
+	Name        string
+	CountryCode string
+	Iata        string
 }
 
 func (q *Queries) UpdateCity(ctx context.Context, arg UpdateCityParams) (City, error) {
-	row := q.db.QueryRowContext(ctx, updateCity, arg.Name, arg.CountryID, arg.ID)
+	row := q.db.QueryRowContext(ctx, updateCity, arg.Name, arg.CountryCode, arg.Iata)
 	var i City
-	err := row.Scan(&i.ID, &i.Name, &i.CountryID)
+	err := row.Scan(&i.Iata, &i.Name, &i.CountryCode)
 	return i, err
 }

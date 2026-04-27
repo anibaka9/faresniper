@@ -22,6 +22,8 @@
                             <th>IATA</th>
                             <th>Name</th>
                             <th>City</th>
+                            <th>Type</th>
+                            <th>Flightable</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -35,12 +37,20 @@
                             </td>
                             <td>{{ .Name }}</td>
                             <td>{{ .CityName }}</td>
+                            <td>{{ .IataType }}</td>
                             <td>
-                                <a href="/airports/{{ .ID }}" class="btn btn-sm"
+                                {{ if .Flightable }}
+                                <span class="badge badge-success badge-sm">Yes</span>
+                                {{ else }}
+                                <span class="badge badge-ghost badge-sm">No</span>
+                                {{ end }}
+                            </td>
+                            <td>
+                                <a href="/airports/{{ .Iata }}" class="btn btn-sm"
                                     >Open</a
                                 >
                                 <a
-                                    href="/airports/{{ .ID }}/edit"
+                                    href="/airports/{{ .Iata }}/edit"
                                     class="btn btn-sm"
                                     >Edit</a
                                 >

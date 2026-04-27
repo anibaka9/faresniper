@@ -14,14 +14,14 @@
         <main class="p-6 w-full">
             <div class="mb-6">
                 <a
-                    href="/airlines/{{ .Airline.ID }}"
+                    href="/airlines/{{ .Airline.Iata }}"
                     class="btn btn-ghost btn-sm"
                     >← Back</a
                 >
             </div>
             <h1 class="text-2xl font-bold mb-6">Edit {{ .Airline.Name }}</h1>
             <form
-                action="/airlines/{{ .Airline.ID }}"
+                action="/airlines/{{ .Airline.Iata }}"
                 method="post"
                 class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md"
             >
@@ -31,9 +31,9 @@
                     >
                         <span
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
-                            >ID</span
+                            >IATA</span
                         >
-                        <span class="font-mono">{{ .Airline.ID }}</span>
+                        <span class="badge badge-outline font-mono">{{ .Airline.Iata }}</span>
                     </div>
                     <fieldset
                         class="fieldset px-6 py-4 border-b border-base-content/5"
@@ -46,45 +46,18 @@
                             value="{{ .Airline.Name }}"
                         />
                     </fieldset>
-                    <fieldset
-                        class="fieldset px-6 py-4 border-b border-base-content/5"
-                    >
-                        <legend class="fieldset-legend">IATA</legend>
-                        <input
-                            type="text"
-                            name="iata"
-                            class="input w-full font-mono"
-                            value="{{ .Airline.Iata }}"
-                        />
-                    </fieldset>
-                    <fieldset
-                        class="fieldset px-6 py-4 border-b border-base-content/5"
-                    >
-                        <legend class="fieldset-legend">FlightsFrom ID</legend>
-                        <input
-                            type="number"
-                            name="flightsfrom_id"
-                            class="input w-full font-mono"
-                            value="{{ .Airline.FlightsfromID }}"
-                        />
-                    </fieldset>
                     <div
                         class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
                     >
                         <span
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
-                            >Active</span
+                            >Lowcost</span
                         >
                         <input
                             type="checkbox"
-                            name="is_active"
+                            name="is_lowcost"
                             class="toggle toggle-primary"
-                            {{
-                            if
-                            .Airline.IsActive
-                            }}checked{{
-                            end
-                            }}
+                            {{ if .Airline.IsLowcost }}checked{{ end }}
                         />
                     </div>
                     <div class="px-6 py-4 flex justify-end">

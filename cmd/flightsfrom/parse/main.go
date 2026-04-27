@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -16,8 +17,5 @@ func main() {
 	if err != nil {
 		log.Fatal("cant parse data: ", err)
 	}
-	err = flightsfrom.SaveToDB(flightData)
-	if err != nil {
-		log.Fatal("cant save: ", err)
-	}
+	fmt.Printf("Parsed %d destinations\n", len(flightData.AllDestinations))
 }

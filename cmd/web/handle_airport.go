@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 	"text/template"
 
 	"github.com/anibaka9/faresniper/internal/database"
@@ -16,13 +15,13 @@ func (s Server) handleAirport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	airportId, err := strconv.Atoi(chi.URLParam(r, "airport_id"))
-	if err != nil {
+	iata := chi.URLParam(r, "airport_id")
+	if iata == "" {
 		http.Error(w, "wrong airport id", http.StatusBadRequest)
 		return
 	}
 
-	airport, err := s.db.Queries.GetAirport(r.Context(), int64(airportId))
+	airport, err := s.db.Queries.GetAirport(r.Context(), iata)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

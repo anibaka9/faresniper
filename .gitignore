@@ -32,4 +32,4 @@ go.work.sum
 # .vscode/
 app.db
 tmp
-./web
+data/

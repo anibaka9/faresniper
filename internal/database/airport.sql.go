@@ -25,101 +25,91 @@ func (q *Queries) CountAirports(ctx context.Context) (int64, error) {
 
 const createAirport = `-- name: CreateAirport :one
 INSERT INTO
-    airports (iata, name, city_id)
+    airports (iata, name, iata_type, flightable, city_iata)
 VALUES
-    (?, ?, ?)
+    (?, ?, ?, ?, ?)
 RETURNING
-    id, iata, name, city_id
+    iata, name, iata_type, flightable, city_iata
 `
 
 type CreateAirportParams struct {
-	Iata   string
-	Name   string
-	CityID int64
+	Iata       string
+	Name       string
+	IataType   string
+	Flightable bool
+	CityIata   string
 }
 
 func (q *Queries) CreateAirport(ctx context.Context, arg CreateAirportParams) (Airport, error) {
-	row := q.db.QueryRowContext(ctx, createAirport, arg.Iata, arg.Name, arg.CityID)
+	row := q.db.QueryRowContext(ctx, createAirport,
+		arg.Iata,
+		arg.Name,
+		arg.IataType,
+		arg.Flightable,
+		arg.CityIata,
+	)
 	var i Airport
 	err := row.Scan(
-		&i.ID,
 		&i.Iata,
 		&i.Name,
-		&i.CityID,
+		&i.IataType,
+		&i.Flightable,
+		&i.CityIata,
 	)
 	return i, err
 }
 
 const getAirport = `-- name: GetAirport :one
 SELECT
-    a.id,
     a.iata,
     a.name,
-    a.city_id,
+    a.iata_type,
+    a.flightable,
+    a.city_iata,
     c.name AS city_name
 FROM
     airports a
-    JOIN cities c ON a.city_id = c.id
+    JOIN cities c ON a.city_iata = c.iata
 WHERE
-    a.id = ?
+    a.iata = ?
 LIMIT
     1
 `
 
 type GetAirportRow struct {
-	ID       int64
-	Iata     string
-	Name     string
-	CityID   int64
-	CityName string
+	Iata       string
+	Name       string
+	IataType   string
+	Flightable bool
+	CityIata   string
+	CityName   string
 }
 
-func (q *Queries) GetAirport(ctx context.Context, id int64) (GetAirportRow, error) {
-	row := q.db.QueryRowContext(ctx, getAirport, id)
+func (q *Queries) GetAirport(ctx context.Context, iata string) (GetAirportRow, error) {
+	row := q.db.QueryRowContext(ctx, getAirport, iata)
 	var i GetAirportRow
 	err := row.Scan(
-		&i.ID,
 		&i.Iata,
 		&i.Name,
-		&i.CityID,
+		&i.IataType,
+		&i.Flightable,
+		&i.CityIata,
 		&i.CityName,
-	)
-	return i, err
-}
-
-const getAirportByIata = `-- name: GetAirportByIata :one
-SELECT
-    id, iata, name, city_id
-FROM
-    airports
-WHERE
-    airports.iata = ?
-LIMIT
-    1
-`
-
-func (q *Queries) GetAirportByIata(ctx context.Context, iata string) (Airport, error) {
-	row := q.db.QueryRowContext(ctx, getAirportByIata, iata)
-	var i Airport
-	err := row.Scan(
-		&i.ID,
-		&i.Iata,
-		&i.Name,
-		&i.CityID,
 	)
 	return i, err
 }
 
 const getAirports = `-- name: GetAirports :many
 SELECT
-    a.id,
     a.iata,
     a.name,
-    a.city_id,
-    c.name city_name
+    a.iata_type,
+    a.flightable,
+    a.city_iata,
+    c.name AS city_name
 FROM
     airports a
-    JOIN cities c ON a.city_id = c.id
+    JOIN cities c ON a.city_iata = c.iata
 LIMIT
     ? OFFSET ?
 `
@@ -130,11 +120,12 @@ type GetAirportsParams struct {
 }
 
 type GetAirportsRow struct {
-	ID       int64
-	Iata     string
-	Name     string
-	CityID   int64
-	CityName string
+	Iata       string
+	Name       string
+	IataType   string
+	Flightable bool
+	CityIata   string
+	CityName   string
 }
 
 func (q *Queries) GetAirports(ctx context.Context, arg GetAirportsParams) ([]GetAirportsRow, error) {
@@ -147,10 +138,11 @@ func (q *Queries) GetAirports(ctx context.Context, arg GetAirportsParams) ([]Get
 	for rows.Next() {
 		var i GetAirportsRow
 		if err := rows.Scan(
-			&i.ID,
 			&i.Iata,
 			&i.Name,
-			&i.CityID,
+			&i.IataType,
+			&i.Flightable,
+			&i.CityIata,
 			&i.CityName,
 		); err != nil {
 			return nil, err
@@ -168,18 +160,16 @@ func (q *Queries) GetAirports(ctx context.Context, arg GetAirportsParams) ([]Get
 
 const getAllAirports = `-- name: GetAllAirports :many
 SELECT
-    a.id,
-    c.name city_name,
-    a.iata
+    a.iata,
+    c.name AS city_name
 FROM
     airports a
-    JOIN cities c ON a.city_id = c.id
+    JOIN cities c ON a.city_iata = c.iata
 `
 
 type GetAllAirportsRow struct {
-	ID       int64
-	CityName string
 	Iata     string
+	CityName string
 }
 
 func (q *Queries) GetAllAirports(ctx context.Context) ([]GetAllAirportsRow, error) {
@@ -191,7 +181,7 @@ func (q *Queries) GetAllAirports(ctx context.Context) ([]GetAllAirportsRow, erro
 	var items []GetAllAirportsRow
 	for rows.Next() {
 		var i GetAllAirportsRow
-		if err := rows.Scan(&i.ID, &i.CityName, &i.Iata); err != nil {
+		if err := rows.Scan(&i.Iata, &i.CityName); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -209,35 +199,39 @@ const updateAirport = `-- name: UpdateAirport :one
 UPDATE
     airports
 SET
-    iata = ?,
     name = ?,
-    city_id = ?
+    iata_type = ?,
+    flightable = ?,
+    city_iata = ?
 WHERE
-    id = ?
+    iata = ?
 RETURNING
-    id, iata, name, city_id
+    iata, name, iata_type, flightable, city_iata
 `
 
 type UpdateAirportParams struct {
-	Iata   string
-	Name   string
-	CityID int64
-	ID     int64
+	Name       string
+	IataType   string
+	Flightable bool
+	CityIata   string
+	Iata       string
 }
 
 func (q *Queries) UpdateAirport(ctx context.Context, arg UpdateAirportParams) (Airport, error) {
 	row := q.db.QueryRowContext(ctx, updateAirport,
-		arg.Iata,
 		arg.Name,
-		arg.CityID,
-		arg.ID,
+		arg.IataType,
+		arg.Flightable,
+		arg.CityIata,
+		arg.Iata,
 	)
 	var i Airport
 	err := row.Scan(
-		&i.ID,
 		&i.Iata,
 		&i.Name,
-		&i.CityID,
+		&i.IataType,
+		&i.Flightable,
+		&i.CityIata,
 	)
 	return i, err
 }

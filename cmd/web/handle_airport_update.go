@@ -9,7 +9,7 @@ import (
 )
 
 func (s Server) handleAirportUpdate(w http.ResponseWriter, r *http.Request) {
-	iata := chi.URLParam(r, "airport_id")
+	iata := chi.URLParam(r, "airport_iata")
 	if iata == "" {
 		http.Error(w, "wrong airport id", http.StatusBadRequest)
 		return
@@ -37,7 +37,7 @@ func (s Server) handleAirportUpdate(w http.ResponseWriter, r *http.Request) {
 		CityIata:   cityIata,
 	})
 	if errors.As(err, &sqliteErr) {
-		http.Error(w, sqliteErr.ExtendedCode.Error(), http.StatusInternalServerError)
+		serverError(w, "update airport "+iata, sqliteErr.ExtendedCode)
 		return
 	}
 	http.Redirect(w, r, "/airports/"+iata, http.StatusSeeOther)

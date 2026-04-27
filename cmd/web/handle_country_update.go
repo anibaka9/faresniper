@@ -9,7 +9,7 @@ import (
 )
 
 func (s Server) handleCountryUpdate(w http.ResponseWriter, r *http.Request) {
-	code := chi.URLParam(r, "country_id")
+	code := chi.URLParam(r, "country_code")
 	if code == "" {
 		http.Error(w, "wrong country id", http.StatusBadRequest)
 		return
@@ -26,7 +26,7 @@ func (s Server) handleCountryUpdate(w http.ResponseWriter, r *http.Request) {
 		Name: name,
 	})
 	if errors.As(err, &sqliteErr) {
-		http.Error(w, sqliteErr.ExtendedCode.Error(), http.StatusInternalServerError)
+		serverError(w, "update country "+code, sqliteErr.ExtendedCode)
 		return
 	}
 	http.Redirect(w, r, "/countries/"+code, http.StatusSeeOther)

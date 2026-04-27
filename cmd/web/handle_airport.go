@@ -11,11 +11,11 @@ import (
 func (s Server) handleAirport(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/airport.html", "./cmd/web/html/sidebar.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
-	iata := chi.URLParam(r, "airport_id")
+	iata := chi.URLParam(r, "airport_iata")
 	if iata == "" {
 		http.Error(w, "wrong airport id", http.StatusBadRequest)
 		return
@@ -23,7 +23,7 @@ func (s Server) handleAirport(w http.ResponseWriter, r *http.Request) {
 
 	airport, err := s.db.Queries.GetAirport(r.Context(), iata)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get airport "+iata, err)
 		return
 	}
 
@@ -35,7 +35,7 @@ func (s Server) handleAirport(w http.ResponseWriter, r *http.Request) {
 		Airport:     airport,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

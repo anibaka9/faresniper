@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 func (s Server) handleCities(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/cities.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
@@ -23,7 +24,7 @@ func (s Server) handleCities(w http.ResponseWriter, r *http.Request) {
 
 	countCities, err := s.db.Queries.CountCities(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "count cities", err)
 		return
 	}
 
@@ -31,8 +32,11 @@ func (s Server) handleCities(w http.ResponseWriter, r *http.Request) {
 		Limit:  Limit,
 		Offset: Limit * int64(page),
 	})
+
+	fmt.Println(cities[0])
+
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get cities", err)
 		return
 	}
 
@@ -53,7 +57,7 @@ func (s Server) handleCities(w http.ResponseWriter, r *http.Request) {
 		Cities:         cities,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

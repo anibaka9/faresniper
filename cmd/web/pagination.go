@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -27,53 +26,33 @@ type PageItem struct {
 	IsGap    bool
 }
 
-const MaxPages = 4
-
 func GetPaginationData(pagination PaginationParams) PaginationData {
-	fmt.Println(pagination.TotalPages)
-	pagesNum := 5
-	if pagination.TotalPages < 5 {
-		pagesNum = int(pagination.TotalPages)
-	}
-	pages := make([]PageItem, pagesNum)
-	if pagination.TotalPages <= MaxPages {
-		for i := 0; i < int(pagination.TotalPages); i++ {
-			pages[i] = PageItem{
-				Number:   i,
-				Label:    strconv.Itoa(i + 1),
-				IsActive: i == int(pagination.CurrentPage),
-				IsGap:    false,
-			}
+	total := pagination.TotalPages
+	current := pagination.CurrentPage
+
+	var pages []PageItem
+
+	if total <= 5 {
+		for i := int64(0); i < total; i++ {
+			pages = append(pages, PageItem{
+				Number:   int(i),
+				Label:    strconv.Itoa(int(i) + 1),
+				IsActive: i == current,
+			})
 		}
 	} else {
-		for i := range MaxPages / 2 {
-			pages[i] = PageItem{
-				Number:   i,
-				Label:    strconv.Itoa(i + 1),
-				IsActive: i == int(pagination.CurrentPage),
-				IsGap:    false,
-			}
-		}
-		pages[MaxPages/2] = PageItem{
-			Number:   MaxPages/2 - 1,
-			Label:    strconv.Itoa(MaxPages/2 + 1),
-			IsActive: false,
-			IsGap:    true,
-		}
-		for i := int(pagination.TotalPages - MaxPages/2); i < int(pagination.TotalPages); i++ {
-			pages[i] = PageItem{
-				Number:   i,
-				Label:    strconv.Itoa(i + 1),
-				IsActive: i == int(pagination.CurrentPage),
-				IsGap:    false,
-			}
-		}
+		pages = append(pages, PageItem{Number: 0, Label: "1", IsActive: current == 0})
+		pages = append(pages, PageItem{Number: 1, Label: "2", IsActive: current == 1})
+		pages = append(pages, PageItem{Number: 0, Label: "...", IsGap: true})
+		pages = append(pages, PageItem{Number: int(total - 2), Label: strconv.Itoa(int(total - 1)), IsActive: current == total-2})
+		pages = append(pages, PageItem{Number: int(total - 1), Label: strconv.Itoa(int(total)), IsActive: current == total-1})
 	}
+
 	return PaginationData{
 		Pages:    pages,
-		HasPrev:  pagination.CurrentPage != 0,
-		HasNext:  pagination.CurrentPage != pagination.TotalPages-1,
-		PrevPage: int(pagination.CurrentPage) - 1,
-		NextPage: int(pagination.CurrentPage) + 1,
+		HasPrev:  current != 0,
+		HasNext:  current != total-1,
+		PrevPage: int(current) - 1,
+		NextPage: int(current) + 1,
 	}
 }

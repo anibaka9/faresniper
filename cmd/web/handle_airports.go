@@ -12,7 +12,7 @@ import (
 func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/airports.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
@@ -23,7 +23,7 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 
 	countAirports, err := s.db.Queries.CountAirports(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "count airports", err)
 		return
 	}
 
@@ -32,7 +32,7 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 		Offset: Limit * int64(page),
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get airports", err)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (s Server) handleAirports(w http.ResponseWriter, r *http.Request) {
 		Airports:       airports,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

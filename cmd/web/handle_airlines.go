@@ -12,7 +12,7 @@ import (
 func (s Server) handleAirlines(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/airlines.html", "./cmd/web/html/sidebar.html", "./cmd/web/html/pagination.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
@@ -23,7 +23,7 @@ func (s Server) handleAirlines(w http.ResponseWriter, r *http.Request) {
 
 	countAirlines, err := s.db.Queries.CountAirlines(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "count airlines", err)
 		return
 	}
 
@@ -32,7 +32,7 @@ func (s Server) handleAirlines(w http.ResponseWriter, r *http.Request) {
 		Offset: Limit * int64(page),
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get airlines", err)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (s Server) handleAirlines(w http.ResponseWriter, r *http.Request) {
 		Airlines:       airlines,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

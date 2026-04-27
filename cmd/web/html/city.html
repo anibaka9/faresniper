@@ -25,9 +25,9 @@
                     >
                         <span
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
-                            >ID</span
+                            >IATA</span
                         >
-                        <span class="font-mono">{{ .City.ID }}</span>
+                        <span class="font-mono">{{ .City.Iata }}</span>
                     </div>
                     <div
                         class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
@@ -43,7 +43,7 @@
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
                             >Country</span
                         >
-                        <a href="/countries/{{ .City.CountryID }}" class="link"
+                        <a href="/countries/{{ .City.CountryCode }}" class="link"
                             >{{ .City.CountryName }}
                             <span
                                 class="badge badge-outline font-mono text-xs ml-1"
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="m-4 flex justify-end">
-                    <a href="/cities/{{ .City.ID }}/edit" class="btn">Edit</a>
+                    <a href="/cities/{{ .City.Iata }}/edit" class="btn">Edit</a>
                 </div>
             </div>
         </main>

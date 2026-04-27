@@ -11,11 +11,11 @@ import (
 func (s Server) handleCityUpdatePage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/city_update.html", "./cmd/web/html/sidebar.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
-	iata := chi.URLParam(r, "city_id")
+	iata := chi.URLParam(r, "city_iata")
 	if iata == "" {
 		http.Error(w, "wrong city id", http.StatusBadRequest)
 		return
@@ -23,13 +23,13 @@ func (s Server) handleCityUpdatePage(w http.ResponseWriter, r *http.Request) {
 
 	city, err := s.db.Queries.GetCity(r.Context(), iata)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get city "+iata, err)
 		return
 	}
 
 	countries, err := s.db.Queries.GetAllCountries(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get countries", err)
 		return
 	}
 
@@ -43,7 +43,7 @@ func (s Server) handleCityUpdatePage(w http.ResponseWriter, r *http.Request) {
 		Countries:   countries,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

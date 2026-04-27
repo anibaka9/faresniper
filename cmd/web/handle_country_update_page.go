@@ -11,11 +11,11 @@ import (
 func (s Server) handleCountryUpdatePage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/country_update.html", "./cmd/web/html/sidebar.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
-	code := chi.URLParam(r, "country_id")
+	code := chi.URLParam(r, "country_code")
 	if code == "" {
 		http.Error(w, "wrong country id", http.StatusBadRequest)
 		return
@@ -23,7 +23,7 @@ func (s Server) handleCountryUpdatePage(w http.ResponseWriter, r *http.Request) 
 
 	country, err := s.db.Queries.GetCountry(r.Context(), code)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get country "+code, err)
 		return
 	}
 
@@ -35,7 +35,7 @@ func (s Server) handleCountryUpdatePage(w http.ResponseWriter, r *http.Request) 
 		Country:     country,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

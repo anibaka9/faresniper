@@ -29,18 +29,18 @@
                         <tr>
                             <td>
                                 <span class="badge badge-outline font-mono"
-                                    >{{ .CountryCode }}</span
+                                    >{{ .Code }}</span
                                 >
                             </td>
                             <td>{{ .Name }}</td>
                             <td>
                                 <a
-                                    href="/countries/{{ .ID }}"
+                                    href="/countries/{{ .Code }}"
                                     class="btn btn-sm"
                                     >Open</a
                                 >
                                 <a
-                                    href="/countries/{{ .ID }}/edit"
+                                    href="/countries/{{ .Code }}/edit"
                                     class="btn btn-sm"
                                     >Edit</a
                                 >

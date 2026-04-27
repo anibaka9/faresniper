@@ -13,13 +13,13 @@
         {{ template "sidebar" .}}
         <main class="p-6 w-full">
             <div class="mb-6">
-                <a href="/cities/{{ .City.ID }}" class="btn btn-ghost btn-sm"
+                <a href="/cities/{{ .City.Iata }}" class="btn btn-ghost btn-sm"
                     >← Back</a
                 >
             </div>
             <h1 class="text-2xl font-bold mb-6">Edit {{ .City.Name }}</h1>
             <form
-                action="/cities/{{ .City.ID }}"
+                action="/cities/{{ .City.Iata }}"
                 method="post"
                 class="card bg-base-100 border border-base-content/5 shadow-sm w-full max-w-md"
             >
@@ -29,9 +29,9 @@
                     >
                         <span
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
-                            >ID</span
+                            >IATA</span
                         >
-                        <span class="font-mono">{{ .City.ID }}</span>
+                        <span class="font-mono">{{ .City.Iata }}</span>
                     </div>
                     <fieldset
                         class="fieldset px-6 py-4 border-b border-base-content/5"
@@ -48,20 +48,20 @@
                         class="fieldset px-6 py-4 border-b border-base-content/5"
                     >
                         <legend class="fieldset-legend">Country</legend>
-                        <select name="country_id" class="select w-full">
+                        <select name="country_code" class="select w-full">
                             {{ range .Countries }}
                             <option
-                                value="{{ .ID }}"
+                                value="{{ .Code }}"
                                 {{
                                 if
                                 eq
-                                .ID
-                                $.City.CountryID
+                                .Code
+                                $.City.CountryCode
                                 }}selected{{
                                 end
                                 }}
                             >
-                                {{ .Name }} ({{ .CountryCode }})
+                                {{ .Name }} ({{ .Code }})
                             </option>
                             {{ end }}
                         </select>

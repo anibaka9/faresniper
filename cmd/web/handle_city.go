@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"text/template"
 
@@ -11,19 +12,20 @@ import (
 func (s Server) handleCity(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/city.html", "./cmd/web/html/sidebar.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
-	iata := chi.URLParam(r, "city_id")
+	iata := chi.URLParam(r, "city_iata")
+	fmt.Println(iata)
 	if iata == "" {
-		http.Error(w, "wrong city id", http.StatusBadRequest)
+		http.Error(w, "wrong city iata", http.StatusBadRequest)
 		return
 	}
 
 	city, err := s.db.Queries.GetCity(r.Context(), iata)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get city "+iata, err)
 		return
 	}
 
@@ -35,7 +37,7 @@ func (s Server) handleCity(w http.ResponseWriter, r *http.Request) {
 		City:        city,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

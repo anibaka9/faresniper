@@ -130,9 +130,13 @@ func SaveCities() error {
 	}
 
 	for _, city := range cities {
+		name := city.Name
+		if en, ok := city.NameTranslations["en"]; ok && en != "" {
+			name = en
+		}
 		_, err := c.Queries.CreateCity(ctx, database.CreateCityParams{
 			Iata:        city.Code,
-			Name:        city.Name,
+			Name:        name,
 			CountryCode: city.CountryCode,
 		})
 		if err != nil {

@@ -40,13 +40,19 @@
                             <td>{{ .IataType }}</td>
                             <td>
                                 {{ if .Flightable }}
-                                <span class="badge badge-success badge-sm">Yes</span>
+                                <span class="badge badge-success badge-sm"
+                                    >Yes</span
+                                >
                                 {{ else }}
-                                <span class="badge badge-ghost badge-sm">No</span>
+                                <span class="badge badge-ghost badge-sm"
+                                    >No</span
+                                >
                                 {{ end }}
                             </td>
                             <td>
-                                <a href="/airports/{{ .Iata }}" class="btn btn-sm"
+                                <a
+                                    href="/airports/{{ .Iata }}"
+                                    class="btn btn-sm"
                                     >Open</a
                                 >
                                 <a

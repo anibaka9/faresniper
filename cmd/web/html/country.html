@@ -25,30 +25,21 @@
                     >
                         <span
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
-                            >ID</span
+                            >Code</span
                         >
-                        <span class="font-mono">{{ .Country.ID }}</span>
+                        <span class="badge badge-outline font-mono text-sm"
+                            >{{ .Country.Code }}</span
+                        >
                     </div>
-                    <div
-                        class="flex items-center justify-between px-6 py-4 border-b border-base-content/5"
-                    >
+                    <div class="flex items-center justify-between px-6 py-4">
                         <span
                             class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
                             >Name</span
                         >
                         <span>{{ .Country.Name }}</span>
                     </div>
-                    <div class="flex items-center justify-between px-6 py-4">
-                        <span
-                            class="text-sm text-base-content/50 uppercase tracking-wide font-medium"
-                            >Code</span
-                        >
-                        <span class="badge badge-outline font-mono text-sm"
-                            >{{ .Country.CountryCode }}</span
-                        >
-                    </div>
                     <div class="m-4 flex justify-end">
-                        <a href="/countries/{{ .Country.ID }}/edit" class="btn"
+                        <a href="/countries/{{ .Country.Code }}/edit" class="btn"
                             >Edit</a
                         >
                     </div>

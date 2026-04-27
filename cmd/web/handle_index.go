@@ -10,13 +10,13 @@ import (
 func (s Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/index.html", "./cmd/web/html/sidebar.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
 	stats, err := s.db.Queries.GetStats(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get stats", err)
 		return
 	}
 
@@ -28,7 +28,7 @@ func (s Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		Stats:       stats,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

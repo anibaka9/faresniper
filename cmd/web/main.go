@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -13,6 +14,10 @@ import (
 const Limit int64 = 10
 
 var sqliteErr sqlite3.Error
+
+func serverError(w http.ResponseWriter, msg string, err error) {
+	http.Error(w, fmt.Sprintf("%s: %v", msg, err), http.StatusInternalServerError)
+}
 
 type Server struct {
 	db *databaseclient.Client
@@ -40,18 +45,18 @@ func main() {
 	r.Get("/airports", server.handleAirports)
 	r.Get("/cities", server.handleCities)
 	r.Get("/countries", server.handleCountries)
-	r.Get("/countries/{country_id}", server.handleCountry)
-	r.Get("/countries/{country_id}/edit", server.handleCountryUpdatePage)
-	r.Post("/countries/{country_id}", server.handleCountryUpdate)
-	r.Get("/airlines/{airline_id}", server.handleAirline)
-	r.Get("/airlines/{airline_id}/edit", server.handleAirlineUpdatePage)
-	r.Post("/airlines/{airline_id}", server.handleAirlineUpdate)
-	r.Get("/airports/{airport_id}", server.handleAirport)
-	r.Get("/airports/{airport_id}/edit", server.handleAirportUpdatePage)
-	r.Post("/airports/{airport_id}", server.handleAirportUpdate)
-	r.Get("/cities/{city_id}", server.handleCity)
-	r.Get("/cities/{city_id}/edit", server.handleCityUpdatePage)
-	r.Post("/cities/{city_id}", server.handleCityUpdate)
+	r.Get("/countries/{country_code}", server.handleCountry)
+	r.Get("/countries/{country_code}/edit", server.handleCountryUpdatePage)
+	r.Post("/countries/{country_code}", server.handleCountryUpdate)
+	r.Get("/airlines/{airline_iata}", server.handleAirline)
+	r.Get("/airlines/{airline_iata}/edit", server.handleAirlineUpdatePage)
+	r.Post("/airlines/{airline_iata}", server.handleAirlineUpdate)
+	r.Get("/airports/{airport_iata}", server.handleAirport)
+	r.Get("/airports/{airport_iata}/edit", server.handleAirportUpdatePage)
+	r.Post("/airports/{airport_iata}", server.handleAirportUpdate)
+	r.Get("/cities/{city_iata}", server.handleCity)
+	r.Get("/cities/{city_iata}/edit", server.handleCityUpdatePage)
+	r.Post("/cities/{city_iata}", server.handleCityUpdate)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
 

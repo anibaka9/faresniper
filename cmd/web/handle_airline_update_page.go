@@ -11,11 +11,11 @@ import (
 func (s Server) handleAirlineUpdatePage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("./cmd/web/html/airline_update.html", "./cmd/web/html/sidebar.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "parse template", err)
 		return
 	}
 
-	iata := chi.URLParam(r, "airline_id")
+	iata := chi.URLParam(r, "airline_iata")
 	if iata == "" {
 		http.Error(w, "wrong airline id", http.StatusBadRequest)
 		return
@@ -23,7 +23,7 @@ func (s Server) handleAirlineUpdatePage(w http.ResponseWriter, r *http.Request) 
 
 	airline, err := s.db.Queries.GetAirline(r.Context(), iata)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "get airline "+iata, err)
 		return
 	}
 
@@ -35,7 +35,7 @@ func (s Server) handleAirlineUpdatePage(w http.ResponseWriter, r *http.Request) 
 		Airline:     airline,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		serverError(w, "render template", err)
 		return
 	}
 }

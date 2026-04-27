@@ -9,9 +9,9 @@ import (
 )
 
 func (s Server) handleAirlineUpdate(w http.ResponseWriter, r *http.Request) {
-	iata := chi.URLParam(r, "airline_id")
+	iata := chi.URLParam(r, "airline_iata")
 	if iata == "" {
-		http.Error(w, "wrong airline id", http.StatusBadRequest)
+		http.Error(w, "wrong airline iata", http.StatusBadRequest)
 		return
 	}
 
@@ -29,7 +29,7 @@ func (s Server) handleAirlineUpdate(w http.ResponseWriter, r *http.Request) {
 		IsLowcost: isLowcost,
 	})
 	if errors.As(err, &sqliteErr) {
-		http.Error(w, sqliteErr.ExtendedCode.Error(), http.StatusInternalServerError)
+		serverError(w, "update airline "+iata, sqliteErr.ExtendedCode)
 		return
 	}
 	http.Redirect(w, r, "/airlines/"+iata, http.StatusSeeOther)

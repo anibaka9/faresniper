@@ -1,5 +1,7 @@
 package travelpayouts
 
+import "time"
+
 // Coordinates вынесена в отдельную структуру для переиспользования в Airport и City
 type Coordinates struct {
 	Lat float64 `json:"lat"`
@@ -46,4 +48,28 @@ type Country struct {
 	Code             string            `json:"code"`
 	Name             string            `json:"name"`
 	Currency         string            `json:"currency"`
+}
+
+type FlightInfo struct {
+	FlightNumber       string    `json:"flight_number"`
+	Link               string    `json:"link"`
+	OriginAirport      string    `json:"origin_airport"`
+	DestinationAirport string    `json:"destination_airport"`
+	DepartureAt        time.Time `json:"departure_at"` // Можно использовать string, если не нужен встроенный парсинг времени
+	Airline            string    `json:"airline"`
+	Destination        string    `json:"destination"`
+	Origin             string    `json:"origin"`
+	Price              int       `json:"price"` // Можно заменить на float64, если цена может быть дробной
+	Gate               string    `json:"gate"`
+	ReturnTransfers    int       `json:"return_transfers"`
+	Duration           int       `json:"duration"`
+	DurationTo         int       `json:"duration_to"`
+	DurationBack       int       `json:"duration_back"`
+	Transfers          int       `json:"transfers"`
+}
+
+type FlightsResponse struct {
+	Data     []FlightInfo `json:"data"`
+	Currency string       `json:"currency"`
+	Success  bool         `json:"success"`
 }

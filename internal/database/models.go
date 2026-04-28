@@ -28,3 +28,14 @@ type Country struct {
 	Code string
 	Name string
 }
+
+type PriceSnapshot struct {
+	ID              int64
+	FlightNumber    string
+	OriginIata      string
+	DestinationIata string
+	DepartureAt     string
+	AirlineIata     string
+	Price           interface{}
+	ObservedAt      string
+}

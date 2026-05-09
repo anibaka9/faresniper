@@ -2,79 +2,185 @@
 
 **Project Goal:** Development of an automated system to find anomalously cheap flight tickets (regular flights, low-cost carriers, and charters) based on specified parameters, incorporating ground transportation logic and complex routing.
 
-**Proposed Tech Stack:**
+**Tech Stack:**
 
 * **Backend/Workers:** Go (for fast, concurrent API polling and scraping).
 * **Database:** SQLite (for storing price history and calculating statistical metrics).
-* **Interface:** Telegram Bot (for configuration and alerts). Potential future dashboard in TypeScript.
+* **Interface:** Web admin panel (Go + HTML templates, chi router). Telegram Bot in later phases.
 
 ### ---
 
-**Phase 1: MVP (Basic Route Tracker)**
+## Phase 1: MVP (Basic Route Tracker)
 
-**Concept:** Collect prices for a fixed list of destinations, build a historical baseline, and send notifications when the price drops below the calculated norm.
+**Concept:** Poll Travelpayouts `prices_for_dates` for a fixed list of routes, accumulate price history, surface price data in the admin panel, and flag anomalously cheap tickets.
 
-* **Data Sources:**
-  * **flightsfrom.com** — scraped to discover the stable set of available routes (which routes actually exist). This is the source of truth for route enumeration.
-  * **Travelpayouts API (Aviasales cache)** — used for historical price statistics. Returns cached search data, not live pricing; used to calculate the price baseline/median per route.
-  * Direct requests to low-cost carrier websites (AirAsia, VietJet, etc.) for live prices.
-* **Workflow:**
-  1. Scrape flightsfrom.com to build a list of available route pairs (e.g., BKK -> KIX, BKK -> NRT).
-  2. A cron job polls Travelpayouts API every N hours for price statistics per route.
-  3. Retrieved prices are saved to the SQLite database.
-  4. The system calculates the median ticket price for each route per month.
-* **Alert Trigger:** If the algorithm finds a ticket priced X% below the calculated median for that route and month, the bot sends a Telegram message with a booking link.
+**Data Sources:**
+* **Travelpayouts IATA databases** — one-time load of reference data: countries, cities, airports, airlines.
+* **Travelpayouts `prices_for_dates` API** — periodic polling for price snapshots per route. Returns airline, airport codes, price, transfers, departure time, booking link.
 
-### ---
+---
 
-**Phase 1.5: Route Intelligence (aeroroutes.com Monitoring)**
+### User Stories
 
-**Concept:** Monitor aviation news to get early warning about new low-cost carrier routes being announced at airports of interest, so a parser can be prepared before the routes go live.
+**Route watchlist**
 
-* **Source:** aeroroutes.com — industry news about new and upcoming routes.
-* **Workflow:**
-  1. Define a watchlist of airports (e.g., BKK, DMK, KUL, SGN).
-  2. A cron job periodically scrapes or checks aeroroutes.com news feed for mentions of watchlist airports.
-  3. If a news item mentions a new route from a low-cost carrier not yet covered by existing parsers, a Telegram notification is sent with the headline and link.
-* **Goal:** Human-in-the-loop — the notification is informational, not automated. Aleksei reviews it and decides whether to build a new carrier parser.
+> As a user, I want to add a flight route (origin + destination IATA) to a watchlist, so that the system starts collecting price data for it.
 
-### ---
+Acceptance criteria:
+- I can open the admin panel and see the list of watched routes
+- I can add a new route by entering two IATA codes
+- I can deactivate a route (stop polling without deleting history)
 
-**Phase 2: Advanced Search (Clusters and Ground Penalty)**
+---
 
-**Concept:** Evaluate neighboring airports to find a cheaper entry/exit point, factoring in the time and money spent on ground transportation.
+**Price data visibility — before anomaly detection is ready**
 
-* **Cluster Configuration:** Create a static configuration file (JSON/YAML) grouping airports into logical zones.
-  * *Example:* "Central Asia Departure" \["FRU", "ALA"\], "Thailand Departure" \["BKK", "DMK", "UTP"\].
-* **Ground Penalty:** Add constants for the cost and time of transit between neighboring nodes to the database (e.g., Surat Thani -> Samui ferry: +$15, +3 hours).
-* **Scoring Logic:**
-  1. The system searches for tickets not only to the target city but to all cities within its cluster.
-  2. The actual cost is calculated: Ticket Price + Ground Penalty.
-  3. If the final cost is better than a direct flight (and fits within the allowed transit time limit), an alert is triggered.
+> As a user, I want to see current prices for a watched route as a price calendar, so that I can immediately understand which departure dates are cheap or expensive.
 
-### ---
+Acceptance criteria:
+- After the first polling cycle I can open a route page and see a calendar view for the current and next month
+- Each day cell shows the cheapest available price for that departure date
+- Days with no data are visually distinct (grey / empty)
+- I can see which airline offers the cheapest price for each day
 
-**Phase 3: Complex Routing (Open-Jaw and Transit Corridors)**
+> As a user, I want to see a table of recent price snapshots for a route, so that I can inspect raw data and verify the system is working.
 
-**Concept:** Automatically assemble itineraries arriving in one city and departing from another, connected by developed ground infrastructure (e.g., high-speed rail networks).
+Acceptance criteria:
+- Table shows: departure date, price, airline, transfers, observed_at, booking link
+- Sortable by price and by departure date
+- Shows when the last polling cycle ran
 
-* **Transit Graphs:** Define railway lines and bus routes connecting airports within macro-regions in the database.
-  * *Example 1 (South China):* CAN (Guangzhou) <-> SZX (Shenzhen) <-> HKG (Hong Kong). Fixed train cost is set (~$20).
-  * *Example 2 (Japan):* KIX (Osaka) <-> NGO (Nagoya) <-> TYO (Tokyo).
-* **Stitching Logic (Async Pipeline):**
-  1. Search for a cheap "Outbound" ticket to any point in the transit corridor (e.g., flight to CAN).
-  2. Search for a cheap "Inbound" ticket from any *other* point in the same corridor N days later (e.g., return from HKG).
-  3. Summation: Outbound Ticket + Inbound Ticket + Fixed Train Cost Between Cities.
-* **Validation:** Check that the total Ground Cost and transit time do not exceed predefined limits; otherwise, the route is discarded as unfeasible.
+> As a user, I want to see how the price for a specific departure date has changed over multiple polling cycles, so that I can understand whether prices are rising or falling.
 
-### ---
+Acceptance criteria:
+- After at least 2 polling cycles: I can see a price trend per departure date (e.g., a small chart or a list of observations over time)
+- Available once enough polling history accumulates (not on day 1)
 
-**Phase 4: Charter Sweeping**
+---
 
-**Concept:** A dedicated module to intercept price dumps from tour operators 24–72 hours before departure.
+**Anomaly detection**
 
-* **Sources:** APIs or parsing of charter ticket exchanges and tour aggregators ("Tickets Only" sections).
-* **Logic Specifics:**
-  * Ignore the median price baseline (charters are inherently cheaper than regular flights).
-  * Trigger based on a hard price threshold (e.g., "any ticket under $50").
-  * Account for charter constraints: notify for One-Way (return flights) or Round-Trip tickets with strictly fixed return dates (e.g., exactly 7/10/14 days).
+> As a user, I want the system to automatically flag tickets that are significantly cheaper than the historical norm for that route and month, so that I don't have to manually compare prices.
+
+Acceptance criteria:
+- Anomaly detection activates only after at least 50 price snapshots are accumulated for a route+month combination
+- A ticket is flagged as anomaly if its price is more than 25% below the median of all observed prices for that route+month
+- Flagged tickets appear in a dedicated Anomalies feed in the admin panel
+- Each anomaly shows: route, departure date, price, airline, % below median, booking link
+- Anomalies feed is sorted by largest discount first
+
+---
+
+**Polling infrastructure**
+
+> As a user, I want price data to be collected automatically on a schedule without manual intervention, so that the history builds up while I'm not at my computer.
+
+Acceptance criteria:
+- A cron job (OS crontab) runs the polling script every 6–12 hours
+- Each run: fetches `prices_for_dates` for current month + next month for all active routes
+- Request params: `limit=1000`, `sorting=price`, `one_way=true`, `currency=usd`
+- Results are saved as price snapshots with `source="travelpayouts"` and `observed_at` timestamp
+- If the API returns an error, the run logs it and continues with the next route (no crash)
+
+---
+
+### Implementation Steps
+
+1. **Reference data (done)**
+   * ✅ DB schema: countries, cities, airports, airlines, price_snapshots
+   * ✅ Load IATA JSON files (countries, cities, airports, airlines) into DB via `cmd/travelpayouts/iata_save`
+
+2. **Route watchlist**
+   * 🔲 Add `watched_routes` table: origin IATA, destination IATA, active flag
+   * 🔲 Admin panel UI: list, add, deactivate routes
+   * MVP: start with one hardcoded route (BSZ → ALA) to validate the pipeline
+
+3. **Price polling**
+   * 🔲 Wire `prices_for_dates` for watchlist routes (2 requests per route: current + next month)
+   * 🔲 Save each returned ticket as price snapshot with `source`, `observed_at`
+   * 🔲 OS crontab entry to run polling every 6–12 hours
+   * ✅ Basic price saving structure (`price_snapshots` table, `prices_load`/`prices_save`) — needs wiring to watchlist
+
+4. **Admin panel — price visibility**
+   * ✅ Web server (`cmd/web`), HTML templates, CRUD for reference entities
+   * 🔲 Price calendar view: month grid, cheapest price per day, per route
+   * 🔲 Snapshots table: filterable, sortable, with booking link
+   * 🔲 Price trend view: history of observed prices for a specific departure date
+
+5. **Anomaly detection**
+   * 🔲 Calculate median price per route+month from accumulated snapshots
+   * 🔲 Minimum 50 snapshots threshold before activating detection
+   * 🔲 Flag tickets at price < median × 0.75
+   * 🔲 Anomalies feed in admin panel: sorted by discount, with booking link
+
+---
+
+### Architecture: Polling
+
+**MVP: OS crontab**
+- Build the polling binary: `go build ./cmd/travelpayouts/prices_load`
+- Add to crontab: runs every 6 hours, logs output to a file
+- DB file lives in the project directory on the local machine
+- Zero new infrastructure
+
+**Next step (when always-on is needed): VPS + long-running process**
+- Single Go binary with internal `time.Ticker` for polling loop
+- Deploy to a cheap VPS (~$5/month)
+- Docker optional — add only when portability becomes a real need
+
+---
+
+## Phase 1.5: Route Intelligence (aeroroutes.com Monitoring)
+
+**Concept:** Monitor aviation news to get early warning about new low-cost carrier routes.
+
+* Cron job scrapes aeroroutes.com news feed for watchlist airports.
+* New uncovered low-cost route → notification in admin panel.
+* Human-in-the-loop: Aleksei reviews and decides whether to build a new scraper.
+
+---
+
+## Phase 2: Direct Airline Scraping
+
+**Concept:** Add real-time price sources for watched routes. Same anomaly detection pipeline, better data quality.
+
+* Scrapers for specific low-cost carrier websites (AirAsia, VietJet, etc.)
+* Snapshots saved with `source="airline_site"`, `is_confirmed=true`
+* Confirmed prices improve baseline accuracy over time (real-time, includes taxes)
+
+---
+
+## Phase 3: Telegram Bot
+
+* Anomaly alerts sent as Telegram messages with booking link.
+* Bot commands for watchlist management.
+* Admin panel remains as companion tool.
+
+---
+
+## Phase 4: Advanced Search (Clusters and Ground Penalty)
+
+**Concept:** Find cheaper entry/exit points via neighboring airports, factoring in ground transport cost and time.
+
+* Cluster config: static file grouping airports into zones (e.g., ["FRU", "ALA"], ["BKK", "DMK", "UTP"]).
+* Ground penalty: cost + time constants per connection (e.g., Surat Thani → Samui: +$15, +3h).
+* Scoring: Ticket Price + Ground Penalty. Flag if cheaper than direct and within time limit.
+
+---
+
+## Phase 5: Complex Routing (Open-Jaw and Transit Corridors)
+
+**Concept:** Assemble itineraries arriving in one city and departing from another via ground transport.
+
+* Transit corridors: CAN ↔ SZX ↔ HKG, KIX ↔ NGO ↔ TYO, etc.
+* Stitching: cheap outbound to any corridor point + cheap inbound from another point N days later + fixed ground cost.
+* Discard if ground cost or transit time exceeds limits.
+
+---
+
+## Phase 6: Charter Sweeping
+
+**Concept:** Intercept price dumps from tour operators 24–72 hours before departure.
+
+* Hard price threshold trigger (e.g., any ticket under $50) — no median baseline.
+* Fixed return date constraints (7/10/14 days).

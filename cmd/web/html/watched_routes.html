@@ -1,0 +1,64 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Faresniper</title>
+        <link rel="stylesheet" href="tailwind/output.css" />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c0392b'/><text x='50' y='72' font-size='60' font-family='monospace' font-weight='bold' fill='white' text-anchor='middle'>f</text></svg>"
+        />
+    </head>
+    <body class="h-screen flex">
+        {{ template "sidebar" .}}
+        <main class="p-6 w-full">
+            <div class="flex justify-between">
+                <h1 class="text-2xl font-bold mb-6">Watched routes</h1>
+                <a href="/watchedroutes/new" class="btn">New route</a>
+            </div>
+            <div
+                class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full"
+            >
+                <table class="table table-hover w-full">
+                    <thead>
+                        <tr>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range .Airlines }}
+                        <tr>
+                            <td>
+                                <span class="badge badge-outline font-mono"
+                                    >{{ .OriginIata }}</span
+                                >
+                            </td>
+                            <td>
+                                <span class="badge badge-outline font-mono"
+                                    >{{ .DestinationIata }}</span
+                                >
+                            </td>
+                            <td>
+                                {{ if .Active }}
+                                <span class="badge badge-success badge-sm"
+                                    >Yes</span
+                                >
+                                {{ else }}
+                                <span class="badge badge-ghost badge-sm"
+                                    >No</span
+                                >
+                                {{ end }}
+                            </td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+            <div class="py-4 flex justify-end">
+                {{ template "pagination" . }}
+            </div>
+        </main>
+    </body>
+</html>

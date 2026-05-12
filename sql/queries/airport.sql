@@ -33,6 +33,8 @@ SELECT
 FROM
     airports a
     JOIN cities c ON a.city_iata = c.iata
+ORDER BY
+    a.iata
 LIMIT
     ? OFFSET ?;
 

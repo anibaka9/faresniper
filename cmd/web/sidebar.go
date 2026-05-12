@@ -27,6 +27,10 @@ var sidebar = []SidebarItem{
 		Title: "Countries",
 		Link:  "/countries",
 	},
+	{
+		Title: "Watched Routes",
+		Link:  "/watchedroutes",
+	},
 }
 
 func GetSidebarData(activePage string) []SidebarItem {

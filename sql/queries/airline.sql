@@ -21,6 +21,8 @@ SELECT
     *
 FROM
     airlines
+ORDER BY
+    name
 LIMIT
     ? OFFSET ?;
 

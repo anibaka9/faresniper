@@ -68,6 +68,8 @@ SELECT
     iata, name, is_lowcost
 FROM
     airlines
+ORDER BY
+    name
 LIMIT
     ? OFFSET ?
 `

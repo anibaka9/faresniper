@@ -57,6 +57,8 @@ func main() {
 	r.Get("/cities/{city_iata}", server.handleCity)
 	r.Get("/cities/{city_iata}/edit", server.handleCityUpdatePage)
 	r.Post("/cities/{city_iata}", server.handleCityUpdate)
+	r.Get("/watchedroutes", server.handleWatchedRoutes)
+	r.Get("/watchedroutes/new", server.handleWatchedRouteCreate)
 
 	r.Handle("/tailwind/*", http.StripPrefix("/tailwind/", http.FileServer(http.Dir("./cmd/web/tailwind"))))
 

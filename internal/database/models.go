@@ -39,3 +39,9 @@ type PriceSnapshot struct {
 	Price           interface{}
 	ObservedAt      string
 }
+
+type WatchedRoute struct {
+	OriginIata      string
+	DestinationIata string
+	Active          bool
+}
